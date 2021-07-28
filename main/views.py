@@ -21,7 +21,7 @@ def ask_question(request):
             question_form.user = request.user
             question_form.save()
             messages.success(request, 'Question has been added.')
-            return redirect('home')
+            return redirect('ask_question')
     context = {'form': form}
     return render(request, 'ask-question.html', context)
 

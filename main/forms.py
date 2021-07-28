@@ -19,7 +19,7 @@ class QuestionForm(ModelForm):
 
     body = forms.CharField(
         label='Body', min_length=30, max_length=100, widget=forms.Textarea(
-            attrs={'rows': 10, 'class': 'form-control mb-3', 'placeholder': 'Enter more details', 'id': 'form-body'}))
+            attrs={'rows': 4, 'class': 'form-control mb-3', 'placeholder': 'Enter more details', 'id': 'form-body'}))
 
     tags = forms.CharField(
         label='Tags', widget=forms.TextInput(
