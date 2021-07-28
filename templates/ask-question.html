@@ -1,1 +1,22 @@
-ask
+{% extends 'base.html' %}
+{% block title %}Ask Question{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container">
+    <div class="row d-flex justify-content-center">
+        <div class="card mt-5 col-md-6">
+            <h5 class="card-header">Ask Question</h5>
+            <div class="card-body">
+                {% for message in messages %}
+                <p class="text-success">{{message}}</p>
+                {% endfor %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{form|crispy}}
+                    <button class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
