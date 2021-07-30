@@ -9,12 +9,10 @@
         <div class="card-body">
             <form method="post" class="form-signin">
                 {% csrf_token %}
-            
-                    {{form|crispy}}
-                 
-                            <button class="btn btn-primary btn-lg">Login</button>
-                       
+                {{form|crispy}}
+                <button class="btn btn-primary btn-lg">Login</button>   
             </form>
+            <P>Don't have an account? Create one <a href="/accounts/register">here</a></P>
         </div>
     </div>
     </div>
