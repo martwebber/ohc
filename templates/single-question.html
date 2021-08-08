@@ -17,9 +17,14 @@
             {% endfor %}
         </p>
         <p>
+            {% if question.user.id == request.user.id %}
+            <a class="btn btn-sm btn-primary mr-2" href="{% url 'update_question' question.id %}">Edit</a>
+            <a class="btn btn-sm btn-danger mr-2" href="{% url 'delete_question' question.id %}">Delete</a>
+            {% endif %}
             <span class="mr-4">{{question.add_time|date:'d/m/Y'}}</span>
             <a href="#">{{question.user.username}}</a>
         </p>
+
         <hr/>
         {% if user.is_authenticated %}
         <form method="post">
@@ -47,6 +52,9 @@
             <a href="#" class="mr-3">{{answer.user.username}}</a>
             <span class="mr-3"><span class="comment-count-{{answer.id}}"></span> comments</span>
             <span>{{answer.add_time|date:'d/m/Y h:i:s'}}</span>
+            {% if answer.user.id == request.user.id %}
+            <a class="btn btn-sm btn-primary mr-2" href="">Edit</a>
+            {% endif %}
         </p>
         <!-- Comment Section Start -->
         <h3 class="my-4">Comment</h3>

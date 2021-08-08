@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, Answer, Comment, DownVote, UpVote
+from .models import Question, Answer, Comment, DownVote, UpVote, Post, Topic
 # from accounts.models import CustomUser
 
 
@@ -19,6 +19,20 @@ class CommentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Comment, CommentAdmin)
+
+
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'user')
+
+
+admin.site.register(Post, PostAdmin)
+
+
+class TopicAdmin(admin.ModelAdmin):
+    list_display = ('topic', 'user')
+
+
+admin.site.register(Topic, TopicAdmin)
 
 
 class UpvoteAdmin(admin.ModelAdmin):

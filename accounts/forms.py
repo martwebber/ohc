@@ -1,7 +1,7 @@
 # from django.forms import ModelForm
 from django import forms
 from django.core.exceptions import ValidationError
-from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
 from .models import CustomUser
 
 
@@ -79,7 +79,7 @@ class UserLoginForm(AuthenticationForm):
                 }))
 
 
-class PwdResetForm(PasswordResetForm):
+class PwordResetForm(PasswordResetForm):
 
     email = forms.EmailField(max_length=254, widget=forms.TextInput(
         attrs={
@@ -97,10 +97,42 @@ class PwdResetForm(PasswordResetForm):
         return email
 
 
-class PwdResetConfirmForm(SetPasswordForm):
+class PwordResetConfirmForm(SetPasswordForm):
     new_password1 = forms.CharField(
         label='New password', widget=forms.PasswordInput(
-            attrs={'class': 'form-control mb-3', 'placeholder': 'New Password', 'id': 'form-newpass'}))
+            attrs={
+                'class': 'form-control mb-3',
+                'placeholder': 'New Password',
+                'id': 'form-newpass'
+                }))
     new_password2 = forms.CharField(
         label='Repeat password', widget=forms.PasswordInput(
-            attrs={'class': 'form-control mb-3', 'placeholder': 'New Password', 'id': 'form-new-pass2'}))
+            attrs={
+                'class': 'form-control mb-3',
+                'placeholder': 'New Password',
+                'id': 'form-new-pass2'
+                }))
+
+
+class PwordChangeForm(PasswordChangeForm):
+    old_password = forms.CharField(
+        label='Old Password', widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control mb-3',
+                'placeholder': 'Old Password',
+                'id': 'form-oldpass'
+                }))
+    new_password1 = forms.CharField(
+        label='New password', widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control mb-3',
+                'placeholder': 'New Password',
+                'id': 'form-newpass'
+                }))
+    new_password2 = forms.CharField(
+        label='Repeat password', widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control mb-3',
+                'placeholder': 'New Password',
+                'id': 'form-new-pass2'
+                }))

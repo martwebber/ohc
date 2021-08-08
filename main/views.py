@@ -1,17 +1,52 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from .forms import QuestionForm, AnswerForm
-from .models import Question, Answer, Comment
+from .forms import QuestionForm, AnswerForm, PostForm
+from .models import Question, Answer, Comment, Post
 from django.views.decorators.csrf import csrf_exempt
-
-
-# from django.core.paginator import Paginator
+from django.core.paginator import Paginator
 from django.contrib import messages
+from django.db.models import Count
+from django.contrib.auth.decorators import login_required
+# from accounts.decorators import admin_only, allowed_users
 
 
 # Homepage
 def home(request):
-    return render(request, 'home.html')
+    if 'q' in request.GET:
+        q = request.GET['q']
+        questions = Question.objects.annotate(total_comments=Count('answer__comment')).filter(title__icontains=q).order_by('-id')
+    else:
+        questions = Question.objects.annotate(total_comments=Count('answer__comment')).all().order_by('-id')
+    paginator = Paginator(questions, 5)
+    page_num = request.GET.get('page', 1)
+    questions = paginator.page(page_num)
+    context = {'questions': questions}
+    return render(request, 'home.html', context)
+
+
+# Homepage
+def posts_page(request):
+    posts = Post.objects.all()
+    paginator = Paginator(posts, 5)
+    page_num = request.GET.get('page', 1)
+    posts = paginator.page(page_num)
+    context = {'posts': posts}
+    return render(request, 'posts-page.html', context)
+
+
+# Create Post
+def create_post(request):
+    form = PostForm
+    if request.method == 'POST':
+        post_form = PostForm(request.POST)
+        if post_form.is_valid():
+            post_form = post_form.save(commit=False)
+            post_form.user = request.user
+            post_form.save()
+            messages.success(request, 'Your story has been posted. Thank you for sharing.')
+            return redirect('posts_page')
+    context = {'form': form}
+    return render(request, 'create-post.html', context)
 
 
 # Ask question
@@ -62,3 +97,29 @@ def save_comment(request):
             )
         context = {'bool': True}
         return JsonResponse(context)
+
+
+@login_required(login_url='login')
+# @allowed_users(allowed_roles=['admin'])
+def deleteQuestion(request, pk):
+    question = Question.objects.get(id=pk)
+    if request.method == 'POST':
+        question.delete()
+        return redirect('/')
+    context = {'question': question}
+    return render(request, 'delete.html', context)
+
+
+# @login_required(login_url='login')
+# @allowed_users(allowed_roles=['admin'])
+def update_question(request, pk):
+    question = Question.objects.get(id=pk)
+    form = QuestionForm(instance=question)
+    if request.method == 'POST':
+        form = QuestionForm(request.POST, instance=question)
+        if form.is_valid():
+            form.save()
+            # messages.success(request, 'Question has been updated.')
+            return redirect('/')
+    context = {'form': form}
+    return render(request, 'ask-question.html', context)

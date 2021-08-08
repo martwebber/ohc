@@ -15,10 +15,10 @@
           </form>
             <ul class="navbar-nav ml-auto">
               <li class="nav-item active">
-                  <a class="nav-link" href="#">Home</a>
+                  <a class="nav-link" href="/">Home</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="#">Share your Story</a>
+                  <a class="nav-link" href="/create-post">Share your Story</a>
               </li>
               <li class="nav-item">
                   <a class="nav-link" href="/ask-question">Ask Question</a>
@@ -26,6 +26,9 @@
               <li class="nav-item">
                 <a class="nav-link" href="/tags">Tags</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts">Posts</a>
+          </li>
               {% if user.is_authenticated %}
               <li class="nav-item">
                   <a class="nav-link" href="/account/profile/{{user.id}}">Profile</a>
