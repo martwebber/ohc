@@ -1,3 +1,4 @@
+from main.models import Topic, Question, Answer
 from django.shortcuts import render, redirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -6,7 +7,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth import login
 from django.contrib import messages
-from .forms import CreateUserForm
+from .forms import CreateUserForm, UserEditForm
 from .token import account_activation_token
 from django.contrib.auth.decorators import login_required
 
@@ -56,11 +57,24 @@ def activate(request, uidb64, token):
 
 
 # Profile
-def profile(request):
-    return render(request, 'registration/profile.html')
+def profile(request, id):
+    user = CustomUser.objects.get(pk=id)
+    questions=Question.objects.filter(user=request.user).order_by('-id')
+    answers=Answer.objects.filter(user=request.user).order_by('-id')
+    topics=Topic.objects.filter(user=request.user).order_by('-id')
+    context = {'user':user, 'questions':questions, 'answers':answers, 'topics':topics}
+    return render(request, 'registration/profile.html', context)
 
 
 # Update user profile
 @login_required
 def edit_profile(request):
-    return render(request, 'registration/update_profile.html', )
+    if request.method == 'POST':
+        user_form = UserEditForm(instance=request.user, data=request.POST)
+        if user_form.is_valid():
+            user_form.save()
+            messages.success(request, 'Your details have been updated successfully')
+    else:
+        user_form = UserEditForm(instance=request.user)
+    context = {'user_form': user_form}
+    return render(request,'registration/update_profile.html',context)

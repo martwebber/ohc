@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}{{tag}}{% endblock %}
+{% block content %}
+    <!-- Question List -->
+    <div class="container">
+        <div class="row d-flex justify-content-center">
+            <div class="card mt-1 col-md-8">
+              <h2 class="my-4">{{topic.topic}}</h2>
+              {% if is_following %}
+              <form method="POST" action="{% url 'main:unfollow-topic' topic.pk %}">
+                  {% csrf_token %}
+                  <button class="btn btn-outline-danger" type="submit">Unfollow</button>
+              </form>
+              {% else %}
+              <form method="POST" action="{% url 'main:follow-topic' topic.pk %}">
+                  {% csrf_token %}
+                  <button class="btn btn-outline-success" type="submit">Follow</button>
+              </form>
+              {% endif %}
+              <p>{{number_of_followers}}</p>
+
+            </div>
+        </div>
+    </div>
+    {% for quest in quests %}
+    <div class="row">
+    <div class="col-12">
+
+      <div class="card">
+
+        <div class="card-body">
+       <p>{{quest.title}}</p>
+</div>
+</div>
+</div>                  
+<div>
+
+
+</div>
+
+       {% endfor %}
+
+{% endblock %}

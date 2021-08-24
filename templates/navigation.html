@@ -5,7 +5,7 @@
           <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-          <form class="ml-auto" action="/">
+          <form class="ml-auto" method="GET" action="{% url 'main:question-search' %}">
             <div class="input-group col-auto">
               <input type="text" name="q" class="form-control form-control-lg" placeholder="Search" />
               <div class="input-group-append">
@@ -18,18 +18,21 @@
                   <a class="nav-link" href="/">Home</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="/create-post">Share your Story</a>
-              </li>
-              <li class="nav-item">
                   <a class="nav-link" href="/ask-question">Ask Question</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/tags">Tags</a>
+                <a class="nav-link" href="/questions">Questions</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/posts">Posts</a>
+              <a class="nav-link" href="/topics">Topics</a>
           </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/tags">Tags</a>
+            </li>
               {% if user.is_authenticated %}
+              <li class="nav-item">
+              <a class="nav-link" href="{% url 'main:favourite_list' %}">Saved Posts</a>
+              </li>
               <li class="nav-item">
                   <a class="nav-link" href="/account/profile/{{user.id}}">Profile</a>
               </li>                                  

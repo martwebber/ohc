@@ -15,7 +15,7 @@
     <!-- Question List -->
  
     
-    <div class="container">
+    <div class="container mb-2">
         {% for question in questions %}
             <div class="row d-flex justify-content-center">
                 <div class="card mt-4 col-md-8">
@@ -23,13 +23,12 @@
                 <h4 class="card-title"><a href="/question/{{question.id}}">{{question.title}}</a></h4>
                 <p class="card-text">{{question.body}}</p>
                 <p>
-                    <a href="#" class="mr-2">{{question.user.username}}</a>
                     <!-- <a href="#" class="mr-2">{{question.answer_set.count}} Answers</a> -->
-                    <a href="#" class="mr-2">{{question.total_comments}} Comments</a>
                 </p>
             </div>
             <div class="card-footer">
                 <small>{{question.add_time}}</small>
+                <a href="#" class="mr-2">{{question.user.username}}</a>
             </div>
         </div>
         </div>

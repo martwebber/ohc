@@ -1,4 +1,4 @@
-# from django.forms import ModelForm
+from django.forms import ModelForm
 from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
@@ -39,7 +39,7 @@ class CreateUserForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'username', 'bio', 'email')
+        fields = ('first_name', 'last_name', 'username', 'email')
 
     def clean_username(self):
         username = self.cleaned_data['username'].lower()
@@ -136,3 +136,53 @@ class PwordChangeForm(PasswordChangeForm):
                 'placeholder': 'New Password',
                 'id': 'form-new-pass2'
                 }))
+
+
+class ProfileForm(ModelForm):
+    class Meta:
+        model=CustomUser
+        fields=('first_name','last_name','username','bio','email')
+
+
+class UserEditForm(forms.ModelForm):
+ 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['bio'].required = False
+        self.fields['first_name'].required = False
+        self.fields['last_name'].required = False
+        self.fields['username'].required = True
+        self.fields['email'].required = True
+
+ 
+ 
+    bio = forms.CharField(
+        label='Bio', min_length=10, max_length=100, widget=forms.Textarea(
+            attrs={'rows':3, 'class': 'form-control mb-3', 'placeholder': 'Enter your bio', 'id': 'form-bio'}))
+ 
+    first_name = forms.CharField(
+        label='First Name', max_length=50, widget=forms.TextInput(
+            attrs={'class': 'form-control mb-3', 'placeholder': 'First Name', 'id': 'form-firstname'}))
+ 
+    last_name = forms.CharField(
+        label='Last Name', max_length=50, widget=forms.TextInput(
+            attrs={'class': 'form-control mb-3', 'placeholder': 'Last Name', 'id': 'form-lastname'}))
+ 
+    username = forms.CharField(
+        label='Username', max_length=200, widget=forms.TextInput(
+            attrs={'class': 'form-control mb-3', 'placeholder': 'Username', 'id': 'form-username'}))
+
+    email = forms.EmailField(
+        label='Email', max_length=200, widget=forms.TextInput(
+            attrs={'class': 'form-control mb-3', 'placeholder': 'Email', 'id': 'form-email'}))
+ 
+    class Meta:
+        model = CustomUser
+        fields = ('bio', 'first_name', 'last_name', 'email')
+ 
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError(
+                'Please use another Email, that is already taken')
+        return email

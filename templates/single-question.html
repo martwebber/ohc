@@ -4,11 +4,26 @@
 {% block title %}OHC | {{question.title}}{% endblock %}
 {% block content %}
 {% load crispy_forms_tags %}
-<!-- Question -->
+<!-- Single question starts here -->
 <div class="container">
     <div class="row d-flex justify-content-center">
-        <div class="card mt-1 col-md-8">
-          <h2 class="my-4">{{question.title}}</h2>
+        <div class="card mt-1 col-md-9 col-sm-8">
+          <div class="row">
+            <div class="col-md-10 col-sm-4 my-3"> 
+            <h2>{{question.title}}</h2>
+            </div>
+            <div class="col-md-2 my-3"> 
+              {% if fav %}
+              <div>
+                <a href="{% url 'main:favourite_add' question.id %}" class="btn btn-sm btn-outline-danger">Remove from bookmark</a>
+              </div>
+              {% else %}
+              <div>
+                <a href="{% url 'main:favourite_add' question.id %}" class="btn btn-sm btn-outline-primary">Add to bookmark</a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
         <p>{{question.body}}</p>
         <p>
             tags:
@@ -17,69 +32,142 @@
             {% endfor %}
         </p>
         <p>
+          <a href="#">{{question.user.username}}</a>
+
             {% if question.user.id == request.user.id %}
-            <a class="btn btn-sm btn-primary mr-2" href="{% url 'update_question' question.id %}">Edit</a>
-            <a class="btn btn-sm btn-danger mr-2" href="{% url 'delete_question' question.id %}">Delete</a>
+            <a class="btn btn-sm btn-primary mr-2" href="{% url 'main:update_question' question.id %}">Edit</a>
+            <a class="btn btn-sm btn-danger mr-2" data-toggle="modal" data-target="#exampleModalQuestion">Delete</a>
             {% endif %}
+            <!-- <a  href="/topic/{{topic.id}}" class="btn btn-secondary btn-sm">{{question.topic}}</a> -->
+            
+
             <span class="mr-4">{{question.add_time|date:'d/m/Y'}}</span>
-            <a href="#">{{question.user.username}}</a>
         </p>
 
+
+
+        <!-- Confirm deletion modal -->
+        <div class="modal fade" id="exampleModalQuestion" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirm deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>Are you sure you want to delete "{{question.title}}"?</p>
+                <form method="POST" action="{% url 'main:delete_question' question.id %}" class="mt-3 mb-3">
+                  {% csrf_token %}
+                <a class="btn btn-secondary" href="{% url 'main:single_question_page' question.id %}">Cancel</a>
+                <input class="btn btn-danger" value="Delete" type="submit" name="Confirm">
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
         <hr/>
         {% if user.is_authenticated %}
-        <form method="post">
+        <form method="post" >
             {% csrf_token %}
             {{answerForm|crispy}}
             <button type="submit" class="btn btn-primary">Post Answer</button>      
         </form>
         <hr/>
         {% endif %}
-    <!-- Answer starts here -->
+    <!-- Answers start here -->
     {% for answer in answers %}
     <div class="row">
-    <div class="col-12">
-        <p>
-            {{ answer.answer }}
-        </p>
-        <p>
-            <div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16">
-                <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
-              </svg>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16">
-                <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
-              </svg>
-            <a href="#" class="mr-3">{{answer.user.username}}</a>
-            <span class="mr-3"><span class="comment-count-{{answer.id}}"></span> comments</span>
-            <span>{{answer.add_time|date:'d/m/Y h:i:s'}}</span>
+      <div class="col-1" style="text-align: center;">
+        <div class="upvote">
+          <strong class="upvote-count-{{answer.id}}"> <span>{{ answer.likes.all.count }}</span></strong><br/>
+          <form method="POST" action="{% url 'main:like' answer.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}">
+              <button class="text-success" type="submit">
+                  <i class="fa fa-arrow-up fa-2x upvote-click"></i>
+              </button>
+          </form>
+        </div>
+        <div class="downvote mt-3">
+          <form method="POST" action="{% url 'main:dislike' answer.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}">
+              <button class="text-danger" type="submit">
+                  <i class="fa fa-arrow-down fa-2x downvote-click"> </i>
+              </button>
+          </form>
+          <strong class="downvote-count-{{answer.id}}"><span>{{ answer.dislikes.all.count }}</span></strong>
+
+      </div>
+      </div>
+    <div class="col-11">
+
+      <div class="card">
+
+        <div class="card-body">
+       <p>{{answer.answer}}</p>
+        </div>
+        <div class="card-footer text-muted">
+          <a href="#" class="mr-1">{{answer.user.username}}</a>
             {% if answer.user.id == request.user.id %}
-            <a class="btn btn-sm btn-primary mr-2" href="">Edit</a>
+            <a class="btn btn-sm btn-primary mr-2" data-toggle="modal" data-target="#EditAnswerModal">Edit</a>
+            <a class="btn btn-sm btn-danger mr-2" data-toggle="modal" data-target="#exampleModal">Delete</a>
+            {% elif answer.question.user.id == request.user.id %}
+            <a class="btn btn-sm btn-danger mr-2" data-toggle="modal" data-target="#exampleModal">Delete</a>
             {% endif %}
-        </p>
-        <!-- Comment Section Start -->
-        <h3 class="my-4">Comment</h3>
-        <div class="comment-wrapper-{{answer.id}}">
-            {% for comment in answer.comment_set.all %}
-            <div class="card mb-2">
-                <div class="card-body">
-                    <p>{{comment.comment}}</p>
-                    <p>
-                        <a href="#">{{comment.user.username}}</a>
-                    </p>
-                </div>
-            </div>
-            {% endfor %}
+            <span>{{answer.add_time|date:'d/m/Y h:i:s'}}</span>
+                 
         </div>
-        {% if user.is_authenticated %}
-        <!-- Comment Form -->
-        <div class="card my-3">
-            <h6 class="card-header">Add Comment</h6>
-            <div class="card-body">
-                <textarea class="form-control comment-text-{{answer.id}}"></textarea>
-                <button type="button" data-answer="{{answer.id}}" class="btn btn-dark my-3 save-comment">Submit</button>
-            </div>
-        </div>
-        {% endif %}
+      </div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete "{{answer}}"?</p>
+        <form method="POST" action="{% url 'main:delete_answer' answer.id %}" class="mt-3 mb-3">
+          {% csrf_token %}
+         <a class="btn btn-secondary" href="{% url 'main:single_question_page' question.id %}">Cancel</a>
+         <input class="btn btn-danger" value="Delete" type="submit" name="Confirm">
+       </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit answer modal -->
+
+<div class="modal fade" id="EditAnswerModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Confirm deletion</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="% url 'main:update_answer' answer.id %}" class="mt-3 mb-3">
+          {% csrf_token %}
+          {{answerForm|crispy}}
+        <a class="btn btn-secondary" href="{% url 'main:single_question_page' question.id %}">Cancel</a>
+        <input class="btn btn-primary" value="Save Changes" type="submit" name="Confirm">
+      </form>
+      
+      </div>
+    </div>
+  </div>
+</div>
+
 
     </div>
 </div>
@@ -93,4 +181,5 @@
 
     </div>
 </div>
+
 {% endblock %}

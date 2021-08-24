@@ -10,7 +10,7 @@ app_name = 'accounts'
 urlpatterns = [
     path('register/', views.register, name='register'),
     # Profile
-    path('profile/', views.profile, name='profile'),
+    path('profile/<int:id>', views.profile, name='profile'),
     path('profile/edit/', views.edit_profile, name='edit'),
     path('login/', auth_views.LoginView.as_view(template_name="registration/login.html",
                                                 authentication_form=UserLoginForm), name='login'),

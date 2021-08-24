@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}OHC | Home{% endblock %}
+{% block content %}
+    <!-- Question List -->
+ 
+    <div class="container">
+
+        {% if questions %}
+       <div> <p>Here are the results for {{q}}</p></div>
+        {% for question in questions %}
+            <div class="row d-flex justify-content-center">
+                <div class="card mt-4 col-md-8">
+            <div class="card-body">
+                <h4 class="card-title"><a href="/question/{{question.id}}">{{question.title}}</a></h4>
+                <p class="card-text">{{question.body}}</p>
+                <p>
+                    <a href="#" class="mr-2">{{question.user.username}}</a>
+                    <!-- <a href="#" class="mr-2">{{question.answer_set.count}} Answers</a> -->
+                </p>
+            </div>
+            <div class="card-footer">
+                <small>{{question.add_time}}</small>
+            </div>
+        </div>
+        </div>
+        
+        {% endfor %}
+        {% else %}
+        <p>No search</p>
+        {% endif %}
+    </div>
+    {% if questions.has_other_pages %}
+    <!-- Pagination -->
+    <nav class="my-3 container">
+        <ul class="pagination">
+            {% if questions.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{questions.previous_page_number}}">Previous</a></li>
+          {% endif %}
+          {% for i in questions.paginator.page_range %}
+          {% if questions.number == i %}
+          <li class="page-item active"><a class="page-link" href="#">{{i}}</a></li>
+          {% else %}
+          <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+          {% endif %}
+          {% endfor %}
+          {% if questions.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{questions.next_page_number}}">Next</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+{% endblock %}
