@@ -28,7 +28,8 @@ def home(request):
     return render(request, 'home.html', context)
 
     
-# Ask question
+# Ask 
+@login_required
 def ask_question(request):
     form = QuestionForm
     if request.method == 'POST':
@@ -65,7 +66,7 @@ def single_question_page(request, id):
     return render(request, 'single-question.html', context)
 
 
-#@login_required(login_url='login')
+@login_required
 # @allowed_users(allowed_roles=['admin'])
 def deleteQuestion(request, pk):
     question = Question.objects.get(id=pk)
@@ -77,8 +78,7 @@ def deleteQuestion(request, pk):
 
 
 
-# @login_required(login_url='login')
-# @allowed_users(allowed_roles=['admin'])
+@login_required
 def updateQuestion(request, pk):
     question = Question.objects.get(id=pk)
     form = QuestionForm(instance=question)
@@ -112,7 +112,7 @@ def deleteAnswer(request, pk):
     return render(request, 'single-question.html', context)
 
 
-# @login_required(login_url='login')
+@login_required
 # @allowed_users(allowed_roles=['admin'])
 def updateAnswer(request, pk):
     answer = Answer.objects.get(id=pk)
@@ -221,19 +221,19 @@ def question_search(request):
     else:
         context = {}
         return render(request, 'search-results.html', context)
-      
+@login_required
 def followTopic(request, pk):
         topic = Topic.objects.get(pk=pk)
         topic.follow.add(request.user)
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
-
+@login_required
 def unfollowTopic(request, pk):
         topic = Topic.objects.get(pk=pk)
         topic.follow.remove(request.user)
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
-
+@login_required
 def AddLike(request, pk):
         post = Answer.objects.get(pk=pk)
 
@@ -263,6 +263,7 @@ def AddLike(request, pk):
         next = request.POST.get('next', '/')
         return HttpResponseRedirect(next)
 
+@login_required
 def AddDislike(request, pk):
     post = Answer.objects.get(pk=pk)
 

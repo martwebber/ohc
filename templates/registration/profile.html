@@ -1,86 +1,38 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load humanize %}
-{% block title %}OHC | {{question.title}}{% endblock %}
+
+{% load crispy_forms_tags %} 
+
 {% block content %}
-{% load crispy_forms_tags %}
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
 
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+        <h1 class="h3 mb-0 text-gray-800">Profile</h1>
+        </div>          
 
-<div class="container py-5">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                <a class="nav-link active" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-home" aria-selected="true">Profile</a>
-                <a class="nav-link" id="v-pills-questions-tab" data-toggle="pill" href="#v-pills-questions" role="tab" aria-controls="v-pills-questions" aria-selected="false">Questions</a>
-                <a class="nav-link" id="v-pills-answers-tab" data-toggle="pill" href="#v-pills-answers" role="tab" aria-controls="v-pills-answers" aria-selected="false">Answers</a>
-                <a class="nav-link" id="v-pills-comments-tab" data-toggle="pill" href="#v-pills-topics" role="tab" aria-controls="v-pills-comments" aria-selected="false">Topics</a>
+        <!-- Main Content Here -->
+        <div class="row">
+          <div class="col-lg-2"></div>
+          <div class="col-lg-3 my-5">
+            <img src="{{user.profile.profile_image.url}}" class="rounded float-right" height="300px" width="300px">
+          </div>
+          <div class="card o-hidden border-0 shadow-lg my-5 col-lg-5">
+            <div class="card-body">
+                <h2>{{user.first_name}} {{user.last_name}}</h2>
+                <p><strong>Email: </strong> {{user.username}} </p>
+                <p><strong>Email: </strong> {{user.email}} </p>
+                <p><strong>Bio: </strong> {{user.profile.bio}} </p>
+                <p><strong>Phone Number: </strong> {{user.profile.phone_number}} </p>
+                <p><strong>DOB: </strong> {{user.profile.birth_date}} </p>
+                <a href="{% url 'accounts:edit' %}" class="btn btn-sm btn-primary shadow-sm">Update Profile</a>
             </div>
+          </div>
         </div>
-        <div class="col-md-9">
-            <div class="tab-content" id="v-pills-tabContent">
-                <!-- Profile -->
-                <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
-                    <div class="card">
-                        <h5 class="card-header">Edit Profile</h5>
-                        <div class="card-body">
-                            
-                        </div>
-                    </div>
-                </div>
-                <!-- Questions -->
-                <div class="tab-pane fade" id="v-pills-questions" role="tabpanel" aria-labelledby="v-pills-questions-tab">
-                    <div class="card">
-                        <h5 class="card-header">My Questions <span class="badge badge-info">{{questions.count}}</span></h5>
-                        <div class="card-body">
-                            {% for question in questions %}
-                            <p><a href="/question/{{question.id}}">{{question.title}}</a></p>
-                            <hr />
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                <!-- Answers -->
-                <div class="tab-pane fade" id="v-pills-answers" role="tabpanel" aria-labelledby="v-pills-answers-tab">
-                    <div class="card">
-                        <h5 class="card-header">My Answers <span class="badge badge-info">{{answers.count}}</span></h5>
-                        <div class="card-body">
-                            <table class="table table-bordered">
-                                <tr>
-                                    <th>Question</th>
-                                    <th>Answer</th>
-                                </tr>
-                                {% for answer in answers %}
-                                <tr>
-                                    <td><a href="/question/{{answer.question.id}}">{{answer.question.title}}</a></td>
-                                    <td><a href="/question/{{answer.question.id}}">{{answer.answer}}</a></td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="v-pills-topics" role="tabpanel" aria-labelledby="v-pills-comments-tab">
-                    <div class="card">
-                        <h5 class="card-header">My Topics <span class="badge badge-info">{{topics.count}}</span></h5>
-                        <div class="card-body">
-                            <table class="table table-bordered">
-                                <tr>
-                                    <th>Question</th>
-                                    <th>Topic</th>
-                                </tr>
-                                {% for topic in topics %}
-                                <tr>
-                                    <td><a href="/question/{{question.id}}">{{question.title}}</a></td>
-                                    <td><a href="/topic/{{topic.id}}">{{topic.follow.user.id}}</a></td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
+        
+        
     </div>
-</div>
-
-{% endblock %}
+    <!-- /.container-fluid -->
+{% endblock content %}

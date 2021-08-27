@@ -5,7 +5,7 @@
 <div class="container">
     <div class="row d-flex justify-content-center">
         <div class="card mt-5 mb-5 col-md-6">
-            <h5 class="card-header">Ask Question</h5>
+            <h5 class="card-header">Update Question</h5>
             <div class="card-body">
                 <!-- {% for message in messages %}
                 <div class="alert alert-success" role="alert">
@@ -15,7 +15,7 @@
                 <form method="post"action="{% url 'main:ask_question' %}">
                     {% csrf_token %}
                     {{form|crispy}}
-                    <button class="btn btn-primary">Submit</button>
+                    <button class="btn btn-primary">Update</button>
                 </form>
             </div>
         </div>

@@ -19,7 +19,7 @@ class QuestionForm(ModelForm):
             attrs={'class': 'form-control mb-3', 'placeholder': 'Enter a title', 'id': 'form-title'}))
 
     body = forms.CharField(
-        label='Body', min_length=30, max_length=100, widget=forms.Textarea(
+        label='Body', min_length=30, max_length=1000, widget=forms.Textarea(
             attrs={'rows': 4, 'class': 'form-control mb-3', 'placeholder': 'Enter more details', 'id': 'form-body'}))
     topic = forms.ModelChoiceField(queryset=Topic.objects.all().order_by('topic'))
     tags = forms.CharField(
@@ -38,7 +38,7 @@ class AnswerForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['answer'].required = True
     answer = forms.CharField(
-        label='', min_length=30, max_length=100, widget=forms.Textarea(
+        label='', min_length=30, max_length=1000, widget=forms.Textarea(
             attrs={'rows': 2, 'class': 'form-control mb-3', 'placeholder': 'Type your answer here...', 'id': 'form-answer'}))
 
     class Meta:

@@ -2,7 +2,7 @@ from django.forms import ModelForm
 from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
-from .models import CustomUser
+from .models import CustomUser, Profile
 
 
 # Creating a Custom user registration form
@@ -186,3 +186,24 @@ class UserEditForm(forms.ModelForm):
             raise forms.ValidationError(
                 'Please use another Email, that is already taken')
         return email
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = [
+            'username', 
+            'first_name', 
+            'last_name', 
+            'email', 
+        ]
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = [
+            'bio',
+            'phone_number',
+            'birth_date',
+            'profile_image'
+        ]
