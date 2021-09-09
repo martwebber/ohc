@@ -20,26 +20,27 @@
               </form>
               {% endif %}
               <p>{{number_of_followers}}</p>
+<hr>
+              <div class="">
+                {% for quest in quests %}
 
-            </div>
-        </div>
-    </div>
-    {% for quest in quests %}
-    <div class="row">
-    <div class="col-12">
+   <div class="mt-3 mb-3">{{quest.title}}</div>
 
-      <div class="card">
-
-        <div class="card-body">
-       <p>{{quest.title}}</p>
-</div>
-</div>
-</div>                  
-<div>
-
-
-</div>
 
        {% endfor %}
+
+  
+              </div>
+
+
+            </div>
+           
+        </div>
+        
+    </div>
+   
+
+</div>
+  
 
 {% endblock %}

@@ -9,7 +9,7 @@
         <div class="card-body">
             <form method="post" class="form-signin">
                 {% csrf_token %}
-                {{form|crispy}}
+                {{loginForm|crispy}}
                 <button class="btn btn-primary btn-lg">Login</button>   
             </form>
             <P>Forgot password? <a href="/account/password_reset">Reset here</a></P>

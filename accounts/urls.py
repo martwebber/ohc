@@ -11,12 +11,13 @@ app_name = 'accounts'
 urlpatterns = [
     path('register/', views.register, name='register'),
     # Profile
-    path('profile/', ProfileView.as_view(), name='profile'),
+    # path('profile/', ProfileView.as_view(), name='profile'),
     path('edit/', ProfileUpdateView.as_view(), name='edit'),
-    # path('profile/<int:id>', views.profile, name='profile'),
+     path('profile/', views.profile, name='profile'),
     # path('profile/edit/', views.edit_profile, name='edit'),
-    path('login/', auth_views.LoginView.as_view(template_name="registration/login.html",
-                                                authentication_form=UserLoginForm), name='login'),
+    # path('login/', auth_views.LoginView.as_view(template_name="registration/login.html",
+    #                                             authentication_form=UserLoginForm), name='login'),
+    path('login/', views.login, name='login'),
     path('password_change/', auth_views.PasswordChangeView.as_view(
         template_name="registration/password_change_form.html", form_class=PwordChangeForm), name='password_change'),
 
@@ -29,4 +30,7 @@ urlpatterns = [
     # path('login/', views.login, name="login"),
 
     path('activate/<slug:uidb64>/<slug:token>)/', views.activate, name='activate'),
+
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+
 ]

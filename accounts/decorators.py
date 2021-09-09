@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 def unauthenticated_user(view_func):
     def wrapper_func(request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('home')
+            return redirect('main:home')
         else:
             return view_func(request, *args, **kwargs)
 
@@ -32,10 +32,13 @@ def admin_only(view_func):
         group = None
         if request.user.groups.exists():
             group = request.user.groups.all()[0].name
-        if group == 'customer':
-            return redirect('user_page')
-        if group == 'admin':
-            return view_func(request, *args, **kwargs)
-        else:
-            return HttpResponse('You are not authorized to access this page')
+		
+        if group == 'patients':
+            return redirect('main:home')
+
+        if group == 'moderators':
+            return redirect('main:admin_dashboard')
+            
+        if group == 'admins':
+            return redirect('main:admin_dashboard')
     return wrapper_function

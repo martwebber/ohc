@@ -12,7 +12,7 @@
                 {{message}}
                 </div>
                 {% endfor %} -->
-                <form method="post"action="{% url 'main:ask_question' %}">
+                <form method="post"action="">
                     {% csrf_token %}
                     {{form|crispy}}
                     <button class="btn btn-primary">Update</button>

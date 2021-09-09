@@ -41,3 +41,5 @@
             }
         }, 200);
     });
+
+    const answerInput = document.getElementById('id_answer')

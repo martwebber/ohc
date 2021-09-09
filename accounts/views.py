@@ -5,35 +5,36 @@ from django.template.loader import render_to_string
 from .models import CustomUser
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.contrib.auth import login
 from django.contrib import messages
-from .forms import CreateUserForm, UserEditForm
+from .forms import CreateUserForm, UserEditForm, UserLoginForm
 from .token import account_activation_token
 from django.contrib.auth.decorators import login_required
-
-
-
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from .forms import UserForm, ProfileForm
 from django.contrib.auth.models import User
 from .models import Profile
-
+from accounts.decorators import unauthenticated_user, allowed_users, admin_only
+from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib import messages
 
 
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, UpdateView
 from .forms import UserForm, ProfileForm
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 
+from django.contrib.auth.models import Group
+
+
 
 
 # User Register
+@unauthenticated_user
 def register(request):
     if request.method == 'POST':
         registerForm = CreateUserForm(request.POST)
@@ -43,6 +44,8 @@ def register(request):
             user.set_password(registerForm.cleaned_data['password'])
             user.is_active = False
             user.save()
+            group = Group.objects.get(name='patients')
+            user.groups.add(group)
             current_site = get_current_site(request)
             subject = 'Activate your account'
             message = render_to_string('registration/account_activation_email.html', {
@@ -51,7 +54,7 @@ def register(request):
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': account_activation_token.make_token(user),
             })
-            user.email_user(subject=subject, message=message)
+            user.email_user(subject=subject, message=message, html_message=None)
             messages.success(request, 'Your account has been created. An activation link has been sent to your email.')
             context = {'registerForm': registerForm}
             return render(request, 'registration/register.html', context)
@@ -71,19 +74,42 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        login(request, user)
+        auth_login(request, user)
         return redirect('login')
     else:
         return render(request, 'registration/activation_invalid.html')
 
+@unauthenticated_user
+def login(request):
+    loginForm = UserLoginForm()
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            auth_login(request, user)
+            if request.user.groups.filter(name="patients").exists():
+                return redirect('main:home')
+            if request.user.groups.filter(name="moderators").exists():
+                return redirect('accounts:admin_dashboard')
+            if request.user.groups.filter(name="admins").exists():
+                return redirect('accounts:admin_dashboard')
+            else:
+                messages.info(request, 'Username or password is incorrect')
+
+    context = {'loginForm': loginForm}
+    return render(request,'registration/login.html', context)
+
 
 # Profile
-def profile(request, id):
-    user = CustomUser.objects.get(pk=id)
+def profile(request):
+   # user = CustomUser.objects.get(pk=id)
     questions=Question.objects.filter(user=request.user).order_by('-id')
     answers=Answer.objects.filter(user=request.user).order_by('-id')
-    topics=Topic.objects.filter(user=request.user).order_by('-id')
-    context = {'user':user, 'questions':questions, 'answers':answers, 'topics':topics}
+    topics=Topic.objects.filter(follow=request.user).order_by('-id')
+    context = {'questions':questions, 'answers':answers, 'topics':topics}
     return render(request, 'registration/profile.html', context)
 
 
@@ -133,3 +159,11 @@ class ProfileUpdateView(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
 
+
+# Admin dashboard
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admins', 'moderators'])
+def admin_dashboard(request):
+    context = {}
+    return render(request, 'admin/dashboard.html', context)

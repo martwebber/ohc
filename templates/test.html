@@ -1,1 +1,4 @@
-text-success
+{% for question in questions %}
+                            <p><a href="/question/{{question.id}}">{{question.title}}</a></p>
+                            <hr />
+                            {% endfor %}

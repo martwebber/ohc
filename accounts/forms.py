@@ -153,6 +153,8 @@ class UserEditForm(forms.ModelForm):
         self.fields['last_name'].required = False
         self.fields['username'].required = True
         self.fields['email'].required = True
+        self.fields['location'].required = False
+
 
  
  
@@ -178,7 +180,7 @@ class UserEditForm(forms.ModelForm):
  
     class Meta:
         model = CustomUser
-        fields = ('bio', 'first_name', 'last_name', 'email')
+        fields = ('bio', 'first_name', 'last_name', 'email', 'location')
  
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -196,14 +198,54 @@ class UserForm(forms.ModelForm):
             'first_name', 
             'last_name', 
             'email', 
+            'bio',
         ]
+
+    def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['bio'].required = False
+            self.fields['first_name'].required = False
+            self.fields['last_name'].required = False
+            self.fields['username'].required = True
+            self.fields['email'].required = True
+
+ 
+ 
+    bio = forms.CharField(
+        label='Bio', min_length=10, max_length=100, widget=forms.Textarea(
+            attrs={'rows':3, 'class': 'form-control mb-3', 'placeholder': 'Enter your bio', 'id': 'form-bio'}))
+ 
+    first_name = forms.CharField(
+        label='First Name', max_length=50, widget=forms.TextInput(
+            attrs={'class': 'form-control mb-3', 'placeholder': 'First Name', 'id': 'form-firstname'}))
+ 
+    last_name = forms.CharField(
+        label='Last Name', max_length=50, widget=forms.TextInput(
+            attrs={'class': 'form-control mb-3', 'placeholder': 'Last Name', 'id': 'form-lastname'}))
+ 
+    username = forms.CharField(
+        label='Username', max_length=200, widget=forms.TextInput(
+            attrs={'class': 'form-control mb-3', 'placeholder': 'Username', 'id': 'form-username'}))
+
+    email = forms.EmailField(
+        label='Email', max_length=200, widget=forms.TextInput(
+            attrs={'class': 'form-control mb-3', 'placeholder': 'Email', 'id': 'form-email'}))
+ 
+ 
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError(
+                'Please use another Email, that is already taken')
+        return email
+
+
+
 
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
             'bio',
-            'phone_number',
-            'birth_date',
-            'profile_image'
+
         ]

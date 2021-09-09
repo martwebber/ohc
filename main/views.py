@@ -1,7 +1,9 @@
 from django import forms
+from django.db import models
 from django.shortcuts import render, redirect, HttpResponseRedirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
-from .forms import QuestionForm, AnswerForm
+from django.views.generic.edit import UpdateView
+from .forms import QuestionForm, AnswerForm, TopicForm
 from .models import Question, Answer, Topic
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
@@ -9,22 +11,26 @@ from django.contrib import messages
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-
+from django.urls import reverse
 
 # from accounts.decorators import admin_only, allowed_users
 
 
 # Homepage
 def home(request):
-    if 'q' in request.GET:
-        q = request.GET['q']
-        questions = Question.objects.filter(title__icontains=q).order_by('-id')
+    user = request.user
+    if not request.user.is_authenticated:
+        questions = Question.objects.all()
+        topics = Topic.objects.all()
     else:
-        questions = Question.objects.all().order_by('-id')
-    paginator = Paginator(questions, 5)
-    page_num = request.GET.get('page', 1)
-    questions = paginator.page(page_num)
-    context = {'questions': questions}
+        topics = Topic.objects.filter(follow=user.id)
+        questions_user = Question.objects.all()
+        
+        questions = Question.objects.annotate(total_answers=Count('answer__question')).filter(Q(topic__in=topics) | Q(user=user))
+        paginator = Paginator(questions, 5)
+        page_num = request.GET.get('page', 1)
+        questions = paginator.page(page_num)
+    context = {'questions': questions, 'topics': topics, }
     return render(request, 'home.html', context)
 
     
@@ -79,21 +85,23 @@ def deleteQuestion(request, pk):
 
 
 @login_required
-def updateQuestion(request, pk):
-    question = Question.objects.get(id=pk)
+def updateQuestion(request, id):
+    question = Question.objects.get(id=id)
     form = QuestionForm(instance=question)
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
         if form.is_valid():
             form.save()
             # messages.success(request, 'Question has been updated.')
-            return redirect('single_question_page')
+            return redirect('main:home')
+            
     context = {'form': form}
     return render(request, 'update-question.html', context)
 
 
 def questionsPage(request):
-    questions = Question.objects.all().order_by('-id')
+    questions = Question.objects.all().order_by('-add_time')
+    #questions = Question.objects.annotate(total_answers=Count('answer__question')).order_by('-total_answers')
     paginator = Paginator(questions, 5)
     page_num = request.GET.get('page', 1)
     questions = paginator.page(page_num)
@@ -115,6 +123,7 @@ def deleteAnswer(request, pk):
 @login_required
 # @allowed_users(allowed_roles=['admin'])
 def updateAnswer(request, pk):
+    # answer = get_object_or_404(id=pk)
     answer = Answer.objects.get(id=pk)
     form = AnswerForm(instance=answer)
     if request.method == 'POST':
@@ -123,8 +132,13 @@ def updateAnswer(request, pk):
             form.save()
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
             # messages.success(request, 'Question has been updated.')
-    context = {}
+        else:
+            form = AnswerForm(instance=answer)
+    else:
+        form = AnswerForm(instance=answer)
+    context = {'form': form}
     return render(request, 'single-question.html', context)
+
 
 @login_required
 def favourite_list(request):
@@ -175,8 +189,13 @@ def tags(request):
 # Tags Page
 def topics(request):
     topics=Topic.objects.all()
+   # quests=Question.objects.annotate(total_questions=Count('topic__question')).filter(topic=topic).order_by('-add_time')
+    topicForm = TopicForm
+    # followers = topic.follow.all()
 
-    return render(request,'topics.html',{'topics':topics})
+    context = {'topics':topics, 'topicForm':topicForm}
+
+    return render(request,'topics.html', context)
 
 # Questions according to tag
 def topic(request,pk):
@@ -185,6 +204,8 @@ def topic(request,pk):
     # topic = Topic.objects.get(pk=pk)
     user = request.user
     followers = topic.follow.all()
+    number_of_followers = len(followers)
+
 
     if len(followers) == 0:
         is_following = False
@@ -292,3 +313,35 @@ def AddDislike(request, pk):
 
     next = request.POST.get('next', '/')
     return HttpResponseRedirect(next)
+
+
+class UpdateQuestionView(UpdateView):
+    model = Question
+    form_class = QuestionForm
+    template_name = 'update-question.html'
+
+    #fields = ['title', 'topic', 'body', 'tags']
+
+
+@login_required
+def add_topic(request):
+    form = TopicForm
+    if request.method == 'POST':
+        form = TopicForm(request.POST)
+        if form.is_valid():
+            form = form.save(commit=False)
+            #question_form.user = request.user
+            form.save()
+            #messages.success(request, 'Question has been added.')
+            return redirect('/')
+    context = {'topicForm': form}
+    return render(request, 'topics.html', context)
+
+
+def deleteTopic(request, pk):
+    topic = Topic.objects.get(id=pk)
+    if request.method == 'POST':
+        topic.delete()
+        return redirect('main:topics')
+    context = {'topic':topic}
+    return render(request, 'single-question.html', context)
