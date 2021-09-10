@@ -24,8 +24,9 @@
                 </p>
             </div>
             <div class="card-footer">
+                <small href="#" class="mr-2"><span class="badge badge-info">{{question.answer_set.count}}</span> {% if question.answer_set.count == 1%}Answer {% else %} Answers {% endif %}</small>
                 <small>{{question.add_time}}</small>
-                <a href="#" class="mr-2">{{question.user.username}}</a>
+                <small class="mr-2 ml-2">{{question.user.username}}</small>
             </div>
         </div>
         </div>

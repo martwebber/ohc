@@ -1,3 +1,4 @@
+from accounts.models import CustomUser
 from django import forms
 from django.forms import ModelForm
 # from django.contrib.auth.forms import UserCreationForm
@@ -19,7 +20,7 @@ class QuestionForm(ModelForm):
             attrs={'class': 'form-control mb-3', 'placeholder': 'Enter a title', 'id': 'form-title'}))
 
     body = forms.CharField(
-        label='Body', min_length=30, max_length=100, widget=forms.Textarea(
+        label='Body', min_length=30, max_length=1000, widget=forms.Textarea(
             attrs={'rows': 4, 'class': 'form-control mb-3', 'placeholder': 'Enter more details', 'id': 'form-body'}))
     topic = forms.ModelChoiceField(queryset=Topic.objects.all().order_by('topic'))
     tags = forms.CharField(
@@ -38,12 +39,32 @@ class AnswerForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['answer'].required = True
     answer = forms.CharField(
-        label='', min_length=30, max_length=100, widget=forms.Textarea(
+        label='', min_length=30, max_length=1000, widget=forms.Textarea(
             attrs={'rows': 2, 'class': 'form-control mb-3', 'placeholder': 'Type your answer here...', 'id': 'form-answer'}))
 
     class Meta:
         model = Answer
         fields = ('answer',)
+
+
+# Topic form
+class TopicForm(ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['topic'].required = True
+        self.fields['user'].required = True
+
+    topic = forms.CharField(
+        label='Topic', widget=forms.TextInput(
+            attrs={'class': 'form-control mb-3', 'placeholder': 'Enter a Topic', 'id': 'form-title'}))
+    user = forms.ModelChoiceField(queryset=CustomUser.objects.all().order_by('username'))
+
+
+    class Meta:
+        model = Topic
+        fields = ('topic','user')
+
 
 
 class PostSearchForm(forms.Form):

@@ -10,23 +10,11 @@
             
             <form class="form-reset p-4 rounded update-form" method="post" enctype="multipart/form-data">
  
-                {% if user_form.is_valid %}
-                {% for message in messages %}
-                <div class="alert alert-primary" role="alert">
-                    {{message}}
-                </div>
-                {% endfor %}
                 <p class="small text-center pt-0">
                     <a href="{% url 'accounts:profile' %}">Back to Dashboard</a>
                 </p>
-                {%else%}
                 <p class=" h4 mb-4 font-weight-bold">Update your details</p>
-                {% endif %}
-                {% if form.errors %}
-                <div class="alert alert-primary" role="alert">
-                    Error: Please try again!
-                </div>
-                {% endif %}
+               
                 {% csrf_token %}
                 <label class="small font-weight-bold">{{ user_form.bio.label }}</label>
                 {{ user_form.bio }}

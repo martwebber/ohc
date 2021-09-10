@@ -13,8 +13,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/fontawesome.min.css" integrity="sha384-wESLQ85D6gbsF459vf1CiZ2+rr+CsxRY0RpiF1tLlQpDnAgg6rwdsUF1+Ics2bni" crossorigin="anonymous"> 
     <!-- Font Awesome 4 -->
     <link rel="stylesheet" href="{% static 'fa4/css/font-awesome.min.css' %}" />
+     <!-- local bootstrap css -->
+     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
+     
     <!-- jquery -->
     <script src="{% static 'js/jquery.js' %}"></script>
+    <!-- local bootstrap js -->
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  
     <!-- Custom js -->
     <script src="{% static 'js/scripts.js' %}"></script>
     <!-- Bootstrap 4 Js -->
@@ -28,11 +34,17 @@
     {% endblock %}
     {% include 'footer.html' %}
 
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+  </script>
+    <script src="{% static 'assets/js/jquery.js' %}"></script>
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+    <!-- You can alternatively load the minified version -->
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
     integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
   </script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
-  </script>
+  
 </body>
 </html>

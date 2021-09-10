@@ -8,7 +8,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 # Topic
 class Topic(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    topic = models.CharField(max_length=100)
+    topic = models.CharField(max_length=100,)
     follow = models.ManyToManyField(CustomUser, blank=True, related_name='follow')
 
 
