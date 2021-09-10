@@ -18,6 +18,7 @@ from .models import Profile
 from accounts.decorators import unauthenticated_user, allowed_users, admin_only
 from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib import messages
+from django.db.models import Count
 
 
 from django.shortcuts import render
@@ -29,6 +30,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 
 from django.contrib.auth.models import Group
+from django.core.paginator import Paginator
+
 
 
 
@@ -104,6 +107,7 @@ def login(request):
 
 
 # Profile
+@login_required
 def profile(request):
    # user = CustomUser.objects.get(pk=id)
     questions=Question.objects.filter(user=request.user).order_by('-id')
@@ -167,3 +171,75 @@ class ProfileUpdateView(LoginRequiredMixin, TemplateView):
 def admin_dashboard(request):
     context = {}
     return render(request, 'admin/dashboard.html', context)
+
+
+@login_required
+def create_user(request):
+    registerForm = CreateUserForm(request.POST)
+    if registerForm.is_valid():
+        user = registerForm.save(commit=False)
+        user.email = registerForm.cleaned_data['email']
+        user.set_password(registerForm.cleaned_data['password'])
+        user.is_active = False
+        user.save()
+        group = Group.objects.get(name='patients')
+        user.groups.add(group)
+        current_site = get_current_site(request)
+        subject = 'Activate your account'
+        message = render_to_string('registration/account_activation_email.html', {
+            'user': user,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            'token': account_activation_token.make_token(user),
+        })
+        user.email_user(subject=subject, message=message, html_message=None)
+        messages.success(request, 'Your account has been created. An activation link has been sent to your email.')
+        context = {'registerForm': registerForm}
+        return render(request, 'registration/register.html', context)
+    else:
+        registerForm = CreateUserForm()
+    context = {'registerForm': registerForm}
+    return render(request, 'admin/all-users.html', context)
+
+
+
+# Users Page
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admins', 'moderators'])
+def users(request):
+    users=CustomUser.objects.all().order_by('-date_joined')
+
+    context = {'users':users, }
+
+    return render(request,'admin/users.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admins'])
+def delete_user(request, pk):
+    user = CustomUser.objects.get(id=pk)
+    if request.method == 'POST':
+        user.delete()
+        return redirect('accounts:users')
+    context = {'user':user}
+    return render(request, 'users.html', context)
+
+
+def questionsPage(request):
+    questions = Question.objects.annotate(total_answers=Count('answer__question')).all().order_by('-add_time')
+    #questions = Question.objects.annotate(total_answers=Count('answer__question')).order_by('-total_answers')
+    paginator = Paginator(questions, 5)
+    page_num = request.GET.get('page', 1)
+    questions = paginator.page(page_num)
+    context = {'questions': questions}
+    return render(request, 'admin/questions.html', context)
+
+
+@login_required
+# @allowed_users(allowed_roles=['admin'])
+def delete_question(request, pk):
+    question = Question.objects.get(id=pk)
+    if request.method == 'POST':
+        question.delete()
+        return redirect('accounts:questions')
+    context = {'question':question}
+    return render(request, 'admin/questions.html', context)

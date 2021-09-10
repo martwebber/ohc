@@ -32,5 +32,12 @@ urlpatterns = [
     path('activate/<slug:uidb64>/<slug:token>)/', views.activate, name='activate'),
 
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin-dashboard/users', views.users, name='users'),
+    path('admin-dashboard/users/<int:pk>', views.delete_user, name='delete_user'),
+    path('admin-dashboard/questions/', views.questionsPage, name='questions'),
+    path('admin-dashboard/questions/<int:pk>', views.delete_question, name='delete_question'),
+
+
+
 
 ]

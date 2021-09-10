@@ -5,10 +5,6 @@
     <div class="container py-5">
         <div class="row">
             <div class="col-md-8 offset-2">
-                <div class="form-floating">
-                    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
-                    <label for="floatingTextarea2">Comments</label>
-                  </div>
             </div>
         </div>             
     </div>
@@ -49,6 +45,7 @@
                 </p>
             </div>
             <div class="card-footer">
+                <small href="#" class="mr-2"><span class="badge badge-info">{{question.answer_set.count}}</span> {% if question.answer_set.count == 1%}Answer {% else %} Answers {% endif %}</small>
                 <small>{{question.add_time}}</small>
                 <small>{{question.user.username}}</small>
             </div>

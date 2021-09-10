@@ -2,7 +2,7 @@
 {% block title %}Ask Question | OHC{% endblock %}
 {% load crispy_forms_tags %}
 {% block content %}
-<div class="container">
+<div class="container mt-3 mb-3">
     <div>
         <div class="row">
             {% for post in new %}
@@ -13,7 +13,7 @@
                             <h2 style="font-size:18px;font-weight:bold">{{post.title|truncatechars:50}}</h2>
                             <p class="card-text">{{post.body|truncatechars:20}}</p>
                             <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">9 mins</small>
+                                <small class="text-muted">{{post.add_time}}</small>
                                 <div id="favourite-section"><a href="{% url 'main:favourite_add' post.id %}"
                                         class="btn btn-outline-primary">Remove</a></div>
                             </div>

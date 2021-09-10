@@ -1,0 +1,67 @@
+{% extends 'admin/admin-base.html' %}
+{% block title %}User Login{% endblock %}
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="container-fluid px-4">
+<div class="row">
+    <h3 class="fs-4 mb-3">Users</h3>
+    <div class="col">
+        <table class="table bg-white rounded shadow-sm table-hover">
+            <thead>
+                <tr>
+                    <th scope="col" width="50">#</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Created on</th>
+                    <th scope="col">Update</th>
+                    <th scope="col">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                {% for user in users %}
+                {% if user != request.user %}
+                <tr>
+                    <th scope="row">{{user.id}}</th>
+                    <td scope="col">{{user.username}}</td>
+                    <td scope="col">{{user.first_name}} </td>
+                    <td scope="col">{{user.last_name}}</td>
+                    <td scope="col">{{user.email}}</td>
+                    <td scope="col">{{user.date_joined}}</td>
+                    <td scope="col"><a class="btn btn-sm btn-primary">Update</a></td>
+                    <td scope="col"><a class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteUserModal">Delete</a></td>
+                </tr>
+
+                        <!-- Confirm deletion modal -->
+        <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModal" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="deleteUserModalLabel">Confirm deletion</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>Are you sure you want to delete "{{user.username}}"?</p>
+                  <form method="POST" action="{% url 'accounts:delete_user' user.id %}" class="mt-3 mb-3">
+                    {% csrf_token %}
+                  <a class="btn btn-secondary" href="{% url 'accounts:users' %}">Cancel</a>
+                  <input class="btn btn-danger" value="Delete" type="submit" name="Confirm">
+                </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+                {% endif %}
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}
