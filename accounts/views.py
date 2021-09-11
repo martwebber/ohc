@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .forms import UserForm, ProfileForm
+from .forms import UserForm, ProfileForm, UserGroupForm
 from django.contrib.auth.models import User
 from .models import Profile
 from accounts.decorators import unauthenticated_user, allowed_users, admin_only
@@ -243,3 +243,28 @@ def delete_question(request, pk):
         return redirect('accounts:questions')
     context = {'question':question}
     return render(request, 'admin/questions.html', context)
+
+
+@login_required
+def groups(request):
+    groups = Group.objects.all()
+    context = {'groups': groups}
+    return render(request, 'admin/groups.html', context)
+
+
+@login_required
+def group_page(request, id):
+    group = Group.objects.get(id=id)
+    userGroupForm = UserGroupForm()
+    # users = CustomUser.objects.filter(groups__name=group)
+    users = group.user_set.all()
+    context = {'group': group,'userGroupForm': userGroupForm, 'users': users}
+    return render(request, 'admin/single-group-page.html', context)
+
+
+# def group_add_user(request, id, pk):
+#     group = Group.objects.get(id=id)
+#     user = CustomUser.objects.get(id=pk)
+#     group.user_set.add(user)
+#     context = {'users': users}
+#     return render(request, 'admin/single-group-page.html', context) 

@@ -36,6 +36,12 @@ urlpatterns = [
     path('admin-dashboard/users/<int:pk>', views.delete_user, name='delete_user'),
     path('admin-dashboard/questions/', views.questionsPage, name='questions'),
     path('admin-dashboard/questions/<int:pk>', views.delete_question, name='delete_question'),
+    path('admin-dashboard/groups/', views.groups, name='groups'),
+    path('admin-dashboard/groups/<int:id>', views.group_page, name='group_page'),
+  #  path('admin-dashboard/groups/<int:id>/add-user/<int:pk>', views.group_add_user, name='group_add_user'),
+
+
+
 
 
 

@@ -24,7 +24,7 @@ def home(request):
         topics = Topic.objects.all()
     else:
         topics = Topic.objects.filter(follow=user.id)
-        questions_user = Question.objects.all()
+        # questions_user = Question.objects.all()
         
         questions = Question.objects.annotate(total_answers=Count('answer__question')).filter(Q(topic__in=topics) | Q(user=user))
         paginator = Paginator(questions, 5)
@@ -60,6 +60,7 @@ def single_question_page(request, id):
     tags = question.tags.split(',')
     answers = Answer.objects.filter(question=question)
     answerform = AnswerForm
+    
     if request.method == 'POST':
         answerContent = AnswerForm(request.POST)
         if answerContent.is_valid():
@@ -234,7 +235,7 @@ def question_search(request):
         query = request.GET.get('q').lower()
         if query != '':
             questions = Question.objects.filter(Q(title__icontains=query) | Q(body__icontains=query))
-            context = {'questions':questions}
+            context = {'questions':questions, 'query':query}
             return render(request, 'search-results.html', context)
         else:
             context = {}
@@ -283,6 +284,8 @@ def AddLike(request, pk):
 
         next = request.POST.get('next', '/')
         return HttpResponseRedirect(next)
+        #return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 @login_required
 def AddDislike(request, pk):
@@ -313,8 +316,9 @@ def AddDislike(request, pk):
 
     next = request.POST.get('next', '/')
     return HttpResponseRedirect(next)
+    #return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-
+@login_required
 class UpdateQuestionView(UpdateView):
     model = Question
     form_class = QuestionForm

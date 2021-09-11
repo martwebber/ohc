@@ -4,6 +4,7 @@
 {% block title %}OHC | {{question.title}}{% endblock %}
 {% block content %}
 {% load crispy_forms_tags %}
+{% load mathfilters %}
 <!-- Single question starts here -->
 <div class="container">
     <div class="row d-flex justify-content-center">
@@ -81,7 +82,7 @@
     <div class="row">
       <div class="col-1 col-sm-2" style="text-align: center;">
         <div class="upvote">
-          <strong class="upvote-count-{{answer.id}}"> <span>{{ answer.likes.all.count }}</span></strong><br/>
+{% comment %}<strong class="upvote-count-{{answer.id}}"> <span>{{ answer.likes.all.count }}</span></strong>{% endcomment %}<br/>
           <form method="POST" action="{% url 'main:like' answer.pk %}">
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ request.path }}">
@@ -90,7 +91,8 @@
               </button>
           </form>
         </div>
-        <div class="downvote mt-3">
+        <strong><span>{{answer.likes.all.count |sub:answer.dislikes.all.count}}</span></strong>
+        <div class="downvote">
           <form method="POST" action="{% url 'main:dislike' answer.pk %}">
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ request.path }}">
@@ -98,7 +100,7 @@
                   <i class="fa fa-arrow-down fa-2x downvote-click"> </i>
               </button>
           </form>
-          <strong class="downvote-count-{{answer.id}}"><span>{{ answer.dislikes.all.count }}</span></strong>
+          {% comment %}<strong class="downvote-count-{{answer.id}}"><span>{% if answer.dislikes.all.count != 0 %}-{% endif %}{{ answer.dislikes.all.count }}</span></strong>{% endcomment %}
 
       </div>
       </div>

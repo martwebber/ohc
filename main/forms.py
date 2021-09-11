@@ -12,7 +12,7 @@ class QuestionForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['title'].required = True
         self.fields['topic'].required = False
-        self.fields['body'].required = True
+        self.fields['body'].required = False
         self.fields['tags'].required = False
 
     title = forms.CharField(

@@ -1,0 +1,32 @@
+{% extends 'admin/admin-base.html' %}
+{% block title %}User Login{% endblock %}
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="container-fluid px-4">
+<div class="row ">
+    <h3 class="fs-4 mb-3">Questions</h3>
+    <div class="col">
+        <table class="table bg-white rounded shadow-sm table-hover">
+            <thead>
+                <tr>
+                    <th scope="col" width="50">#</th>
+                    <th scope="col">Group Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                {% for group in groups %}
+                <tr>
+                    <th scope="row">{{group.id}}</th>
+                    <td scope="col"><a href="{% url 'accounts:group_page' group.id %}">{{group.name}}</a></td>
+                </tr>
+
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+{% endblock %}

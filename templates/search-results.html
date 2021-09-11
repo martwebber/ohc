@@ -6,7 +6,7 @@
     <div class="container">
 
         {% if questions %}
-       <div> <p>Here are the results for {{q}}</p></div>
+       <p class="col-md-8 mt-3">Here are the results for <strong>"{{query}}"</strong></p>
         {% for question in questions %}
             <div class="row d-flex justify-content-center">
                 <div class="card mt-4 col-md-8">

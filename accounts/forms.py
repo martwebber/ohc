@@ -249,3 +249,17 @@ class ProfileForm(forms.ModelForm):
             'bio',
 
         ]
+
+
+# Topic form
+class UserGroupForm(ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user'].required = True
+
+    user = forms.ModelChoiceField(queryset=CustomUser.objects.all().order_by('username'))
+
+    class Meta:
+        model = CustomUser
+        fields = ('user',)

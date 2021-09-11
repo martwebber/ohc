@@ -39,7 +39,7 @@
                 <div class="card mt-2 col-md-8">
             <div class="card-body">
                 <h4 class="card-title"><a href="/question/{{question.id}}">{{question.title}}</a></h4>
-                <p class="card-text">{{question.body}}</p>
+                <p class="card-text">{{question.body|truncatewords:10}}</p>
                 <p>
                     <!-- <a href="#" class="mr-2">{{question.answer_set.count}} Answers</a> -->
                 </p>
