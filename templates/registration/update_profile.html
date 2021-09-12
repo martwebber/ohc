@@ -9,37 +9,54 @@
         <div class="card-body">
             
             <form class="form-reset p-4 rounded update-form" method="post" enctype="multipart/form-data">
- 
+
+                {% if user_form.is_valid and profile_form.is_valid  %}
+                <div class="alert alert-primary" role="alert">
+                    Details successfully updated!
+                </div>
                 <p class="small text-center pt-0">
                     <a href="{% url 'accounts:profile' %}">Back to Dashboard</a>
                 </p>
-                <p class=" h4 mb-4 font-weight-bold">Update your details</p>
-               
+                {%else%}
+                <p class=" h4 mb-4 font-weight-bold">Change your details</p>
+                <p>You can edit your account using the following form:</p>
+                {% endif %}
+
+                {% if form.errors %}
+                <div class="alert alert-primary" role="alert">
+                    Error: Please try again!
+                </div>
+                {% endif %}
+
                 {% csrf_token %}
-                <label class="small font-weight-bold">{{ user_form.bio.label }}</label>
-                {{ user_form.bio }}
+                <label class="small font-weight-bold">{{ profile_form.bio.label}}</label>
+                {{ profile_form.bio }}
                 <div class="row">
-                <div class="col">
-                <label class="small font-weight-bold">{{ user_form.first_name.label }}</label>
+                    <div class="col">
+                <label class="small font-weight-bold">First Name: </label>
                 {{ user_form.first_name }}
-                </div>                           
+                </div>
                 <div class="col">
-                <label class="small font-weight-bold">{{ user_form.last_name.label}}</label>
+                <label class="small font-weight-bold">Last Name:</label>
                 {{ user_form.last_name }}
                 </div>
                 </div>
                 <div class="row">
                     <div class="col">
-                        <label class="small font-weight-bold">{{ user_form.username.label}}</label>
-                        {{ user_form.username }}
-                        </div>
-                    <div class="col">
-                    <label class="small font-weight-bold">{{ user_form.email.label}}</label>
-                    {{ user_form.email }}
-                    </div>                           
-                    </div>
+                <label class="small font-weight-bold">Username:</label>
+                {{ user_form.username }}            
+                </div>                
+                <div class="col">
+                <label class="small font-weight-bold">Email:</label>
+                {{ user_form.email }}    
+                </div>
+                </div>
+
+               
+
+
                 <button class="btn btn-primary py-2 mb-4 mt-5 font-weight-bold" type="submit"
-                    value="Save changes">Update</button>
+                    value="Save changes">Save Changes</button>
             </form>
         </div>
     </div>

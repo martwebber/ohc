@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}OHC | {{answer.answer}}{% endblock %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+<br>
+<div class="container">
+<div class="row d-flex justify-content-center">
+	<div class="col-md-6">
+		<div class="card card-body mb-3">
+			
+			<h4>Update Answer</h4>
+			<form method="POST" action="{% url 'main:update_answer' answer.id %}">
+				 {% csrf_token %}
+				 {{form|crispy}}
+				<a class="btn btn-warning" href="{% url 'main:single_question_page' answer.question.id %}">Cancel</a>
+				<input class="btn btn-primary" type="submit" value="Update answer" name="Confirm">
+			</form>
+		</div>
+	</div>
+</div>
+</div>
+
+{% endblock %}

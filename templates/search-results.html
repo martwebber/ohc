@@ -14,11 +14,11 @@
                 <h4 class="card-title"><a href="/question/{{question.id}}">{{question.title}}</a></h4>
                 <p class="card-text">{{question.body}}</p>
                 <p>
-                    <a href="#" class="mr-2">{{question.user.username}}</a>
                     <!-- <a href="#" class="mr-2">{{question.answer_set.count}} Answers</a> -->
                 </p>
             </div>
             <div class="card-footer">
+                <small href="#" class="mr-2">{{question.user.username}}</small>
                 <small>{{question.add_time}}</small>
             </div>
         </div>

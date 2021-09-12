@@ -114,31 +114,28 @@ def questionsPage(request):
 @login_required(login_url='login')
 def deleteAnswer(request, pk):
     answer = Answer.objects.get(id=pk)
+   # question = Question.objects.filter(answer=answer)
     if request.method == 'POST':
         answer.delete()
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    context = {}
-    return render(request, 'single-question.html', context)
+        return HttpResponseRedirect(reverse('main:single_question_page', args=(answer.question.id,)))
+    context = {'answer':answer, }
+    return render(request, 'delete-answer.html', context)
 
 
 @login_required
 # @allowed_users(allowed_roles=['admin'])
 def updateAnswer(request, pk):
-    # answer = get_object_or_404(id=pk)
-    answer = Answer.objects.get(id=pk)
+    answer = get_object_or_404(Answer, id=pk)
+    #answer = Answer.objects.get(id=pk)
     form = AnswerForm(instance=answer)
     if request.method == 'POST':
         form = AnswerForm(request.POST, instance=answer)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-            # messages.success(request, 'Question has been updated.')
-        else:
-            form = AnswerForm(instance=answer)
-    else:
-        form = AnswerForm(instance=answer)
-    context = {'form': form}
-    return render(request, 'single-question.html', context)
+            return HttpResponseRedirect(reverse('main:single_question_page', args=(answer.question.id,)))
+            messages.success(request, 'Question has been updated.')
+    context = {'form': form, 'answer': answer}
+    return render(request, 'update-answer.html', context)
 
 
 @login_required

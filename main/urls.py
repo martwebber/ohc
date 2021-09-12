@@ -46,6 +46,8 @@ urlpatterns = [
     path('add-topic/', views.add_topic, name='add_topic'),
     path('delete-topic/<int:pk>', views.deleteTopic, name='delete_topic'),
 
+    
+
 
 
 

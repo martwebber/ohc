@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path                                                                                                                                                                                                                                                                                                                                
 from . import views
 # from django.contrib.auth.decorators import user_passes_test
 # from django.views.generic import TemplateView
@@ -12,7 +12,10 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     # Profile
     # path('profile/', ProfileView.as_view(), name='profile'),
-    path('edit/', ProfileUpdateView.as_view(), name='edit'),
+    # path('profile/edit/', ProfileUpdateView.as_view(), name='edit'),
+    # path('edit/', views.edit_profile, name='edit'),
+    path('profile/edit/', views.edit, name='edit'),
+
      path('profile/', views.profile, name='profile'),
     # path('profile/edit/', views.edit_profile, name='edit'),
     # path('login/', auth_views.LoginView.as_view(template_name="registration/login.html",

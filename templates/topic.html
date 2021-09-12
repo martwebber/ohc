@@ -20,11 +20,17 @@
               </form>
               {% endif %}
               <p>{{number_of_followers}}</p>
-<hr>
+<hr>                                    
+{% if quests %}
+<h4>Questions related to <strong>"{{topic}}"</strong></h4>
+
+{% else %}
+
+{%endif%}
               <div class="">
                 {% for quest in quests %}
 
-   <div class="mt-3 mb-3">{{quest.title}}</div>
+   <div class="mt-3 mb-3"><a href="{% url 'main:single_question_page' quest.id%}">{{quest.title}}</a></div>
 
 
        {% endfor %}

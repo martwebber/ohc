@@ -4,11 +4,27 @@
 {% block title %}OHC | {{question.title}}{% endblock %}
 {% block content %}
 {% load crispy_forms_tags %}
-<!-- Question -->
+{% load mathfilters %}
+<!-- Single question starts here -->
 <div class="container">
     <div class="row d-flex justify-content-center">
-        <div class="card mt-1 col-md-8">
-          <h2 class="my-4">{{question.title}}</h2>
+        <div class="card mt-1 col-md-9 col-sm-8">
+          <div class="row">
+            <div class="col-md-10 col-sm-4 my-3"> 
+            <h2>{{question.title}}</h2>
+            </div>
+            <div class="col-md-2 my-3"> 
+              {% if fav %}
+              <div>
+                <a href="{% url 'main:favourite_add' question.id %}" class="btn btn-sm btn-outline-danger">Remove from bookmark</a>
+              </div>
+              {% else %}
+              <div>
+                <a href="{% url 'main:favourite_add' question.id %}" class="btn btn-sm btn-outline-primary">Add to bookmark</a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
         <p>{{question.body}}</p>
         <p>
             tags:
@@ -17,95 +33,143 @@
             {% endfor %}
         </p>
         <p>
+          <a href="#">{{question.user.username}}</a>
+<span>{{question.answer.count}}</span>
             {% if question.user.id == request.user.id %}
             <a class="btn btn-sm btn-primary mr-2" href="{% url 'main:update_question' question.id %}">Edit</a>
-            <a class="btn btn-sm btn-danger mr-2" href="{% url 'main:delete_question' question.id %}">Delete</a>
+            <a class="btn btn-sm btn-danger mr-2" data-toggle="modal" data-target="#exampleModalQuestion">Delete</a>
             {% endif %}
+            <!-- <a  href="/topic/{{topic.id}}" class="btn btn-secondary btn-sm">{{question.topic}}</a> -->
+            
+
             <span class="mr-4">{{question.add_time|date:'d/m/Y'}}</span>
-            <a href="#">{{question.user.username}}</a>
         </p>
 
+
+
+        <!-- Confirm deletion modal -->
+        <div class="modal fade" id="exampleModalQuestion" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirm deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>Are you sure you want to delete "{{question.title}}"?</p>
+                <form method="POST" action="{% url 'main:delete_question' question.id %}" class="mt-3 mb-3">
+                  {% csrf_token %}
+                <a class="btn btn-secondary" href="{% url 'main:single_question_page' question.id %}">Cancel</a>
+                <input class="btn btn-danger" value="Delete" type="submit" name="Confirm">
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
         <hr/>
         {% if user.is_authenticated %}
-        <form method="post">
+        <form method="post" >
             {% csrf_token %}
             {{answerForm|crispy}}
             <button type="submit" class="btn btn-primary">Post Answer</button>      
         </form>
         <hr/>
         {% endif %}
-    <!-- Answer starts here -->
+    <!-- Answers start here -->
     {% for answer in answers %}
     <div class="row">
-    <div class="col-12">
-        <p>
-            {{ answer.answer }}
-        </p>
-        <p>
-            <!-- testing upvote/downvote -->
+      <div class="col-1 col-sm-2" style="text-align: center;">
+        <div class="upvote">
+{% comment %}<strong class="upvote-count-{{answer.id}}"> <span>{{ answer.likes.all.count }}</span></strong>{% endcomment %}<br/>
+          <form method="POST" action="{% url 'main:like' answer.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}">
+              <button class="text-success" type="submit">
+                  <i class="fa fa-arrow-up fa-2x upvote-click"></i>
+              </button>
+          </form>
+        </div>
+        <strong><span>{{answer.likes.all.count |sub:answer.dislikes.all.count}}</span></strong>
+        <div class="downvote">
+          <form method="POST" action="{% url 'main:dislike' answer.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}">
+              <button class="text-danger" type="submit">
+                  <i class="fa fa-arrow-down fa-2x downvote-click"> </i>
+              </button>
+          </form>
+          {% comment %}<strong class="downvote-count-{{answer.id}}"><span>{% if answer.dislikes.all.count != 0 %}-{% endif %}{{ answer.dislikes.all.count }}</span></strong>{% endcomment %}
 
+      </div>
+      </div>
+    <div class="col-10 align-items-end">
 
-                <span id="thumbs" data-value="{{post.id}}"></span>
-                <div class="pr-2">
-                  <span id="i_like_this"><span id="up">{{post.thumbsup}}</span></span>
-                  <a {% if request.user.is_authenticated %}
-                    class="btn btn-link text-dark p-0 border-0 btn-outline-light thumbaction" {% else %}
-                    href="{% url 'accounts:register' %}" class="btn btn-link text-dark p-0 border-0 btn-outline-light"
-                    {% endif %} value="thumbsup" data-toggle="tooltip" title="I like this" role="button">
-                    <svg id="thumbsup" width="1.5em" height="1.5em" viewBox="0 0 16 16" class="up bi bi-hand-thumbs-up"
-                      fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                      <path fill-rule="evenodd"
-                        d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16v-1c.563 0 .901-.272 1.066-.56a.865.865 0 0 0 .121-.416c0-.12-.035-.165-.04-.17l-.354-.354.353-.354c.202-.201.407-.511.505-.804.104-.312.043-.441-.005-.488l-.353-.354.353-.354c.043-.042.105-.14.154-.315.048-.167.075-.37.075-.581 0-.211-.027-.414-.075-.581-.05-.174-.111-.273-.154-.315L12.793 9l.353-.354c.353-.352.373-.713.267-1.02-.122-.35-.396-.593-.571-.652-.653-.217-1.447-.224-2.11-.164a8.907 8.907 0 0 0-1.094.171l-.014.003-.003.001a.5.5 0 0 1-.595-.643 8.34 8.34 0 0 0 .145-4.726c-.03-.111-.128-.215-.288-.255l-.262-.065c-.306-.077-.642.156-.667.518-.075 1.082-.239 2.15-.482 2.85-.174.502-.603 1.268-1.238 1.977-.637.712-1.519 1.41-2.614 1.708-.394.108-.62.396-.62.65v4.002c0 .26.22.515.553.55 1.293.137 1.936.53 2.491.868l.04.025c.27.164.495.296.776.393.277.095.63.163 1.14.163h3.5v1H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z" />
-                    </svg>
-                  </a>
-                </div>
-                <div class="pr-2">
-                  <span id="down">{{post.thumbsdown}}</span>
-                  <a {% if request.user.is_authenticated %}
-                    class="btn btn-link text-dark p-0 border-0 btn-outline-light thumbaction" {% else %}
-                    href="{% url 'accounts:register' %}" class="btn btn-link text-dark p-0 border-0 btn-outline-light"
-                    {% endif %} value="thumbsdown" data-toggle="tooltip" title="I dont like this" role="button">
-                    <svg id="thumbsdown" width="1.5em" height="1.5em" viewBox="0 0 16 16" class="down bi bi-hand-thumbs-down"
-                      fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                      <path fill-rule="evenodd"
-                        d="M6.956 14.534c.065.936.952 1.659 1.908 1.42l.261-.065a1.378 1.378 0 0 0 1.012-.965c.22-.816.533-2.512.062-4.51.136.02.285.037.443.051.713.065 1.669.071 2.516-.211.518-.173.994-.68 1.2-1.272a1.896 1.896 0 0 0-.234-1.734c.058-.118.103-.242.138-.362.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2.094 2.094 0 0 0-.16-.403c.169-.387.107-.82-.003-1.149a3.162 3.162 0 0 0-.488-.9c.054-.153.076-.313.076-.465a1.86 1.86 0 0 0-.253-.912C13.1.757 12.437.28 11.5.28v1c.563 0 .901.272 1.066.56.086.15.121.3.121.416 0 .12-.035.165-.04.17l-.354.353.353.354c.202.202.407.512.505.805.104.312.043.44-.005.488l-.353.353.353.354c.043.043.105.141.154.315.048.167.075.37.075.581 0 .212-.027.415-.075.582-.05.174-.111.272-.154.315l-.353.353.353.354c.353.352.373.714.267 1.021-.122.35-.396.593-.571.651-.653.218-1.447.224-2.11.164a8.907 8.907 0 0 1-1.094-.17l-.014-.004H9.62a.5.5 0 0 0-.595.643 8.34 8.34 0 0 1 .145 4.725c-.03.112-.128.215-.288.255l-.262.066c-.306.076-.642-.156-.667-.519-.075-1.081-.239-2.15-.482-2.85-.174-.502-.603-1.267-1.238-1.977C5.597 8.926 4.715 8.23 3.62 7.93 3.226 7.823 3 7.534 3 7.28V3.279c0-.26.22-.515.553-.55 1.293-.138 1.936-.53 2.491-.869l.04-.024c.27-.165.495-.296.776-.393.277-.096.63-.163 1.14-.163h3.5v-1H8c-.605 0-1.07.08-1.466.217a4.823 4.823 0 0 0-.97.485l-.048.029c-.504.308-.999.61-2.068.723C2.682 1.815 2 2.434 2 3.279v4c0 .851.685 1.433 1.357 1.616.849.232 1.574.787 2.132 1.41.56.626.914 1.28 1.039 1.638.199.575.356 1.54.428 2.591z" />
-                    </svg>
-                  </a>
-                </div>
-        
+      <div class="card">
 
-    </div>
-            <a href="#" class="mr-3">{{answer.user.username}}</a>
-            <span class="mr-3"><span class="comment-count-{{answer.id}}"></span> comments</span>
-            <span>{{answer.add_time|date:'d/m/Y h:i:s'}}</span>
+        <div class="card-body">
+       <p>{{answer.answer}}</p>
+        </div>
+        <div class="card-footer text-muted">
+          <a href="#" class="mr-1">{{answer.user.username}}</a>
             {% if answer.user.id == request.user.id %}
-            <a class="btn btn-sm btn-primary mr-2" href="">Edit</a>
+            <a class="btn btn-sm btn-primary mr-2" data-toggle="modal" data-target="#EditAnswerModal">Edit</a>
+            <a class="btn btn-sm btn-danger mr-2" data-toggle="modal" data-target="#deleteanswerModal">Delete</a>
+            {% elif answer.question.user.id == request.user.id %}
+            <a class="btn btn-sm btn-danger mr-2" data-toggle="modal" data-target="#deleteanswerModal">Delete</a>
             {% endif %}
-        </p>
-        <!-- Comment Section Start -->
-        <h3 class="my-4">Comment</h3>
-        <div class="comment-wrapper-{{answer.id}}">
-            {% for comment in answer.comment_set.all %}
-            <div class="card mb-2">
-                <div class="card-body">
-                    <p>{{comment.comment}}</p>
-                    <p>
-                        <a href="#">{{comment.user.username}}</a>
-                    </p>
-                </div>
-            </div>
-            {% endfor %}
+            <span>{{answer.add_time|date:'d/m/Y h:i:s'}}</span>
+                 
         </div>
-        {% if user.is_authenticated %}
-        <!-- Comment Form -->
-        <div class="card my-3">
-            <h6 class="card-header">Add Comment</h6>
-            <div class="card-body">
-                <textarea class="form-control comment-text-{{answer.id}}"></textarea>
-                <button type="button" data-answer="{{answer.id}}" class="btn btn-dark my-3 save-comment">Submit</button>
-            </div>
-        </div>
-        {% endif %}
+      </div>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteanswerModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete "{{answer}}"?</p>
+        <form method="POST" action="{% url 'main:delete_answer' answer.id %}" class="mt-3 mb-3">
+          {% csrf_token %}
+         <a class="btn btn-secondary" href="{% url 'main:single_question_page' question.id %}">Cancel</a>
+         <input class="btn btn-danger" value="Delete" type="submit" name="Confirm">
+       </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit answer modal -->
+
+<div class="modal fade" id="EditAnswerModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Answer</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" data-url="{% url 'book_update' form.instance.id %}" class="update-form">
+          {% csrf_token %}
+          {{form|crispy}}
+        <a class="btn btn-secondary" href="{% url 'main:single_question_page' question.id %}">Cancel</a>
+        <input class="btn btn-primary" value="Save Changes" type="submit" name="Confirm">
+      </form>
+      
+      </div>
+    </div>
+  </div>
+</div>
+
 
     </div>
 </div>
@@ -119,41 +183,55 @@
 
     </div>
 </div>
-
 <script>
-     $(document).ready(function () {
-    $('.thumbaction').click(function (e) {
-      e.preventDefault();
-      var postid = document.getElementById('thumbs').getAttribute('data-value');
-      var button = $(this).attr("value");
-      $.ajax({
-        type: 'POST',
-        url: '{% url "accounts:thumbs" %}',
-        data: {
-          postid: postid,
-          csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-          action: 'thumbs',
-          button: button,
-        },
-        success: function (json) {
-          if (json.length < 1 || json == undefined) {
-            //empty
-          }
-          document.getElementById("up").innerHTML = json['up']
-          document.getElementById("down").innerHTML = json['down']
-          $("svg").removeClass("thumb-active");
+  $(document).ready(function(){
+	var ShowForm = function(){
+		var btn = $(this);
+		$.ajax({
+			url: btn.attr("data-url"),
+			type: 'get',
+			dataType:'json',
+			beforeSend: function(){
+				$('#modal-book').modal('show');
+			},
+			success: function(data){
+				$('#modal-book .modal-content').html(data.html_form);
+			}
+		});
+	};
 
-          if (json['remove'] == 'none') {
-            $("#" + button).removeClass("thumb-active");
-          } else {
-            $("#" + button).addClass("thumb-active");
-          }
+	var SaveForm =  function(){
+		var form = $(this);
+		$.ajax({
+			url: form.attr('data-url'),
+			data: form.serialize(),
+			type: form.attr('method'),
+			dataType: 'json',
+			success: function(data){
+				if(data.form_is_valid){
+					$('#book-table tbody').html(data.book_list);
+					$('#modal-book').modal('hide');
+				} else {
+					$('#modal-book .modal-content').html(data.html_form)
+				}
+			}
+		})
+		return false;
+	}
 
-        },
-        error: function (xhr, errmsg, err) {}
-      });
-    });
-  });
+// create 
+$(".show-form").click(ShowForm);
+$("#modal-book").on("submit",".create-form",SaveForm);
 
+//update
+$('#book-table').on("click",".show-form-update",ShowForm);
+$('#modal-book').on("submit",".update-form",SaveForm)
+
+//delete
+$('#book-table').on("click",".show-form-delete",ShowForm);
+$('#modal-book').on("submit",".delete-form",SaveForm)
+});
 </script>
+
 {% endblock %}
+                     

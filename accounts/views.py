@@ -2,35 +2,23 @@ from main.models import Topic, Question, Answer
 from django.shortcuts import render, redirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
-from .models import CustomUser
+from .models import CustomUser, Profile
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib import messages
-from .forms import CreateUserForm, UserEditForm, UserLoginForm
+from .forms import CreateUserForm, UserEditForm, UserProfileForm, UserLoginForm, UserForm, ProfileForm, UserGroupForm
 from .token import account_activation_token
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .forms import UserForm, ProfileForm, UserGroupForm
-from django.contrib.auth.models import User
-from .models import Profile
 from accounts.decorators import unauthenticated_user, allowed_users, admin_only
 from django.contrib.auth import authenticate, login as auth_login, logout
-from django.contrib import messages
 from django.db.models import Count
-
-
-from django.shortcuts import render
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
 from django.views.generic import TemplateView, UpdateView
-from .forms import UserForm, ProfileForm
-from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
-
 from django.contrib.auth.models import Group
 from django.core.paginator import Paginator
+from django.urls import reverse
 
 
 
@@ -118,17 +106,42 @@ def profile(request):
 
 
 # Update user profile
+# @login_required
+# def edit_profile(request):
+#     if request.method == 'POST':
+#         user_form = UserEditForm(instance=request.user, data=request.POST)
+#         if user_form.is_valid():
+#             user_form.save()
+#             messages.success(request, 'Your details have been updated successfully')
+#             return redirect('accounts:profile')
+
+#     else:
+#         user_form = UserEditForm(instance=request.user)
+#     context = {'user_form': user_form}
+#     return render(request,'registration/update_profile.html',context)
+
+
 @login_required
-def edit_profile(request):
+def edit(request):
     if request.method == 'POST':
-        user_form = UserEditForm(instance=request.user, data=request.POST)
-        if user_form.is_valid():
+        user_form = UserEditForm(instance=request.user,
+                                 data=request.POST)
+
+        profile_form = UserProfileForm(
+            request.POST, instance=request.user.profile)
+
+        if profile_form.is_valid() and user_form.is_valid():
             user_form.save()
-            messages.success(request, 'Your details have been updated successfully')
+            profile_form.save()
+            return HttpResponseRedirect(reverse('accounts:profile'))
     else:
         user_form = UserEditForm(instance=request.user)
-    context = {'user_form': user_form}
-    return render(request,'registration/update_profile.html',context)
+        profile_form = UserProfileForm(instance=request.user.profile)
+
+    return render(request,
+                  'registration/update_profile.html',
+                  {'user_form': user_form, 'profile_form': profile_form})
+
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):
