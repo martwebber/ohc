@@ -36,13 +36,17 @@ urlpatterns = [
 
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin-dashboard/users', views.users, name='users'),
-    path('admin-dashboard/users/<int:pk>', views.delete_user, name='delete_user'),
+    path('admin-dashboard/users/<int:id>', views.user_page, name='user_page'),
+    path('admin-dashboard/user/<int:id>', views.delete_user, name='delete_user'),
     path('admin-dashboard/questions/', views.questionsPage, name='questions'),
+    path('admin-dashboard/answers/', views.answersPage, name='answers'),
     path('admin-dashboard/questions/<int:pk>', views.delete_question, name='delete_question'),
     path('admin-dashboard/groups/', views.groups, name='groups'),
     path('admin-dashboard/groups/<int:id>', views.group_page, name='group_page'),
-  #  path('admin-dashboard/groups/<int:id>/add-user/<int:pk>', views.group_add_user, name='group_add_user'),
+    path('admin-dashboard/groups/<int:id>', views.group_add_user, name='group_add_user'),
 
+    path('admin-dashboard/topics/',views.topics,name='topics'),
+    path('admin-dashboard/topic/<int:pk>',views.topic,name='topic'),
 
 
 

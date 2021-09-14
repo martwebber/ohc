@@ -1,14 +1,18 @@
-    <!-- Sidebar -->
+{% load user_tags %}
+
+<!-- Sidebar -->
     <div class="bg-white" id="sidebar-wrapper">
         <div class="sidebar-heading text-center py-4 fs-4 fw-bold text-uppercase border-bottom">OHC</div>
         <div class="list-group list-group-flush my-3">
             
             <a href="{% url 'accounts:admin_dashboard' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Overview</a>
+            {% if request.user|has_group:"moderators" %}
             <a href="{% url 'accounts:users' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Users</a>
             <a href="{% url 'accounts:groups' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Groups</a>
+            {% endif %}
             <a href="{% url 'accounts:questions' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Questions</a>
-            <a href="#" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Answers</a>
-            <a href="#" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Topics</a>
+            <a href="{% url 'accounts:answers' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Answers</a>
+            <a href="{% url 'accounts:topics' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Topics</a>
             <a href="{% url 'logout' %}" class="list-group-item list-group-item-action bg-transparent text-danger fw-bold">Logout</a>
         </div>
     </div>

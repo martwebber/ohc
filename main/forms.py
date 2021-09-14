@@ -53,17 +53,17 @@ class TopicForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['topic'].required = True
-        self.fields['user'].required = True
+        #self.fields['user'].required = True
 
     topic = forms.CharField(
         label='Topic', widget=forms.TextInput(
             attrs={'class': 'form-control mb-3', 'placeholder': 'Enter a Topic', 'id': 'form-title'}))
-    user = forms.ModelChoiceField(queryset=CustomUser.objects.all().order_by('username'))
+   # user = forms.ModelChoiceField(queryset=CustomUser.objects.all().order_by('username'))
 
 
     class Meta:
         model = Topic
-        fields = ('topic','user')
+        fields = ('topic',)
 
 
 

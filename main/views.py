@@ -331,10 +331,11 @@ def add_topic(request):
         form = TopicForm(request.POST)
         if form.is_valid():
             form = form.save(commit=False)
-            #question_form.user = request.user
+            form.user = request.user
             form.save()
             #messages.success(request, 'Question has been added.')
             return redirect('/')
+
     context = {'topicForm': form}
     return render(request, 'topics.html', context)
 

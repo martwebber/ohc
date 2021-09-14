@@ -1,0 +1,38 @@
+{% extends 'admin/admin-base.html' %}
+{% block title %}OHC | Answers{% endblock %}
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="container-fluid px-4">
+<div class="row ">
+    <h3 class="fs-4 mb-3">Answers</h3>
+    <div class="col">
+        <table class="table bg-white rounded shadow-sm table-hover">
+            <thead>
+                <tr>
+                    <th scope="col" width="50">#</th>
+                    <th scope="col">Answer</th>
+                    <th scope="col">Question</th>
+                    <th scope="col">Author</th>
+                    <th scope="col">Created on</th>
+                    <th scope="col">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for answer in answers %}
+                <tr>
+                    <th scope="row">{{answer.id}}</th>
+                    <td scope="col">{{answer.answer}}</td>
+                    <td scope="col"><a href="">{{answer.question.title}}</a></td>
+                    <td scope="col">{{answer.user.username}} </td>
+                    <td scope="col">{{answer.add_time}}</td>
+                    <td scope="col"><a class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteUserModal">Delete</a></td>
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+{% endblock %}

@@ -1,3 +1,4 @@
+from django.db.models.deletion import PROTECT
 from main.models import Topic, Question, Answer
 from django.shortcuts import render, redirect
 from django.contrib.sites.shortcuts import get_current_site
@@ -19,7 +20,8 @@ from django.views.generic import TemplateView, UpdateView
 from django.contrib.auth.models import Group
 from django.core.paginator import Paginator
 from django.urls import reverse
-
+from datetime import timedelta
+from django.utils.timezone import now
 
 
 
@@ -182,7 +184,11 @@ class ProfileUpdateView(LoginRequiredMixin, TemplateView):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['admins', 'moderators'])
 def admin_dashboard(request):
-    context = {}
+    dt = now()
+    latestQuestions = Question.objects.filter(add_time__range=(dt-timedelta(hours=24), dt))
+    latestAnswers = Answer.objects.filter(add_time__range=(dt-timedelta(hours=24), dt))
+    newUsers = CustomUser.objects.filter(date_joined__range=(dt-timedelta(hours=24), dt))
+    context = {'latestQuestions': latestQuestions, 'latestAnswers': latestAnswers, 'newUsers': newUsers,}
     return render(request, 'admin/dashboard.html', context)
 
 
@@ -228,8 +234,8 @@ def users(request):
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['admins'])
-def delete_user(request, pk):
-    user = CustomUser.objects.get(id=pk)
+def delete_user(request, id):
+    user = CustomUser.objects.get(id=id)
     if request.method == 'POST':
         user.delete()
         return redirect('accounts:users')
@@ -275,9 +281,74 @@ def group_page(request, id):
     return render(request, 'admin/single-group-page.html', context)
 
 
-# def group_add_user(request, id, pk):
-#     group = Group.objects.get(id=id)
-#     user = CustomUser.objects.get(id=pk)
-#     group.user_set.add(user)
-#     context = {'users': users}
-#     return render(request, 'admin/single-group-page.html', context) 
+def group_add_user(request, id):
+    group = Group.objects.get(id=id)
+    add_user_to_group_form = UserGroupForm(request.POST)
+    if add_user_to_group_form.is_valid():
+        user = add_user_to_group_form.save(commit=False)
+        user.usename = add_user_to_group_form.cleaned_data['username']
+        print(user.username)
+        user.groups.add(group)
+    #user = 
+    #group.user_set.add(user)
+    context = {'group': group, 'add_user_to_group_form': add_user_to_group_form,}
+    return render(request, 'admin/single-group-page.html', context) 
+
+
+def answersPage(request):
+    answers = Answer.objects.all().order_by('-add_time')
+    #questions = Question.objects.annotate(total_answers=Count('answer__question')).order_by('-total_answers')
+    paginator = Paginator(answers, 5)
+    page_num = request.GET.get('page', 1)
+    answers = paginator.page(page_num)
+    context = {'answers': answers,}
+    return render(request, 'admin/answers.html', context)
+
+
+@login_required
+def user_page(request, id):
+    user = CustomUser.objects.get(id=id)
+    userForm = UserEditForm()
+    # users = CustomUser.objects.filter(groups__name=group)
+    #users = group.user_set.all()
+    context = {'user': user,'userForm': userForm,}
+    return render(request, 'admin/user-page.html', context)
+
+
+# Tags Page
+def topics(request):
+    topics=Topic.objects.all()
+    context = {'topics':topics,}
+    return render(request,'admin/topics.html', context)
+
+
+
+# Questions according to tag
+def topic(request,pk):
+    topic = Topic.objects.get(pk=pk)
+    quests=Question.objects.filter(topic=topic).order_by('-add_time')
+    # topic = Topic.objects.get(pk=pk)
+    user = request.user
+    followers = topic.follow.all()
+    number_of_followers = len(followers)
+
+
+    if len(followers) == 0:
+        is_following = False
+    for follower in followers:
+        if follower == request.user:
+            is_following = True
+            break
+        else:
+            is_following = False
+
+    number_of_followers = len(followers)
+
+    context = {
+        'user': user,
+        'topic': topic,
+        'quests': quests,
+        'number_of_followers': number_of_followers,
+        'is_following': is_following,
+    }
+    return render(request,'admin/topic.html',context)

@@ -15,8 +15,7 @@
                     <th scope="col">Last Name</th>
                     <th scope="col">Email</th>
                     <th scope="col">Created on</th>
-                    <th scope="col">Update</th>
-                    <th scope="col">Delete</th>
+                    <th scope="col">View User Details</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,9 +29,8 @@
                     <td scope="col">{{user.last_name}}</td>
                     <td scope="col">{{user.email}}</td>
                     <td scope="col">{{user.date_joined}}</td>
-                    <td scope="col"><a class="btn btn-sm btn-primary">Update</a></td>
-                    <td scope="col"><a class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteUserModal">Delete</a></td>
-                </tr>
+                    <td scope="col"><a href="{% url 'accounts:user_page' user.id %}" class="btn btn-sm btn-primary">View User Details</a></td>
+                  </tr>
 
                         <!-- Confirm deletion modal -->
         <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModal" aria-hidden="true">

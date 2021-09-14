@@ -45,15 +45,6 @@
     <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
       <div class="d-flex justify-content-between">
         <h5 class="text-gray-dark col-md-6"><a href="{% url 'main:topic' topic.id %}">{{topic.topic}}</a> <span class="badge badge-primary">{{topic.follow.count}}</span></h5>
-        
-        {% if request.user|has_group:"moderators" %}
-        <a class="btn btn-sm btn-primary  mr-2 ml-2 mt-2 mb-2" href="">Edit</a>
-        <a class="btn btn-sm btn-danger  mr-2 ml-2 mt-2 mb-2" data-toggle="modal" data-target="#deleteTopicModal">Delete</a>
-      {% elif request.user|has_group:"patients" %}
-      <a class="btn btn-outline-success mr-2 ml-2 mt-2 mb-2" href="#">Follow</a>
-      {% else %}
-
-      {% endif %}
       </div>
     </div>
   </div>
