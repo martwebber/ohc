@@ -1,0 +1,189 @@
+{% extends 'admin/admin-base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}OHC | {{question.title}}{% endblock %}
+{% block content %}
+{% load crispy_forms_tags %}
+{% load mathfilters %}
+<!-- Single question starts here -->
+<div class="container">
+    <div class="row d-flex justify-content-center">
+        <div class="card mt-1 mb-1 col-md-9 col-sm-8">
+          <div class="row">
+            <div class="col-md-10 col-sm-4 my-3"> 
+            <h2>{{question.title}}</h2>
+            </div>
+            <div class="col-md-2 my-3"> 
+              <!-- {% if fav %}
+              <div>
+                <a href="{% url 'main:favourite_add' question.id %}" class="btn btn-sm btn-outline-danger">Remove from bookmark</a>
+              </div>
+              {% else %}
+              <div>
+                <a href="{% url 'main:favourite_add' question.id %}" class="btn btn-sm btn-outline-primary">Add to bookmark</a>
+              </div>
+              {% endif %} -->
+            </div>
+          </div>
+        <p>{{question.body}}</p>
+        <p>
+            tags:
+            {% for tag in tags %}
+            <a href="/tag/{{tag|slugify}}" class="badge badge-secondary p-1">{{tag}}</a>
+            {% endfor %}
+        </p>
+        <p>
+          <small href="#">{{question.user.username}}</small>
+<span>{{question.answer.count}}</span>
+            {% if question.user.id == request.user.id %}
+            <!-- <a class="btn btn-sm btn-primary mr-2" href="{% url 'main:update_question' question.id %}">Edit</a> -->
+            <a class="btn btn-sm btn-danger mr-2" data-toggle="modal" data-target="#exampleModalQuestion">Delete</a>
+            {% endif %}
+            <!-- <a  href="/topic/{{topic.id}}" class="btn btn-secondary btn-sm">{{question.topic}}</a> -->
+            
+
+            <span class="mr-4">{{question.add_time|date:'d/m/Y'}}</span>
+        </p>
+
+
+
+        <!-- Confirm deletion modal -->
+        <div class="modal fade" id="exampleModalQuestion" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirm deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>Are you sure you want to delete "{{question.title}}"?</p>
+                <form method="POST" action="{% url 'main:delete_question' question.id %}" class="mt-3 mb-3">
+                  {% csrf_token %}
+                <a class="btn btn-secondary" href="{% url 'main:single_question_page' question.id %}">Cancel</a>
+                <input class="btn btn-danger" value="Delete" type="submit" name="Confirm">
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr/>
+        {% if user.is_authenticated %}
+        <form method="post" >
+            {% csrf_token %}
+            {{answerForm|crispy}}
+            <button type="submit" class="btn btn-primary">Post Answer</button>      
+        </form>
+        <hr/>
+        {% endif %}
+    <!-- Answers start here -->
+    {% for answer in answers %}
+    <div class="row">
+      <div class="col-1 col-sm-2" style="text-align: center;">
+        <div class="upvote">
+{% comment %}<strong class="upvote-count-{{answer.id}}"> <span>{{ answer.likes.all.count }}</span></strong>{% endcomment %}<br/>
+          <form method="POST" action="{% url 'main:like' answer.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}">
+              <button class="text-success" type="submit">
+                  <i class="fa fa-arrow-up fa-2x upvote-click"></i>
+              </button>
+          </form>
+        </div>
+        <strong><span>{{answer.likes.all.count |sub:answer.dislikes.all.count}}</span></strong>
+        <div class="downvote">
+          <form method="POST" action="{% url 'main:dislike' answer.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}">
+              <button class="text-danger" type="submit">
+                  <i class="fa fa-arrow-down fa-2x downvote-click"> </i>
+              </button>
+          </form>
+          {% comment %}<strong class="downvote-count-{{answer.id}}"><span>{% if answer.dislikes.all.count != 0 %}-{% endif %}{{ answer.dislikes.all.count }}</span></strong>{% endcomment %}
+
+      </div>
+      </div>
+    <div class="col-10 align-items-end">
+
+      <div class="card">
+
+        <div class="card-body">
+       <p>{{answer.answer}}</p>
+        </div>
+        <div class="card-footer text-muted">
+          <a href="#" class="mr-1">{{answer.user.username}}</a>
+            {% if answer.user.id == request.user.id %}
+            <a class="btn btn-sm btn-primary mr-2" href="{% url 'main:update_answer' answer.id %}">Edit</a>
+            <a class="btn btn-sm btn-danger mr-2" href="{% url 'main:delete_answer' answer.id %}">Delete</a>
+            {% elif answer.question.user.id == request.user.id %}
+            <a class="btn btn-sm btn-danger mr-2" data-toggle="modal" data-target="#deleteanswerModal">Delete</a>
+            {% endif %}
+            <span>{{answer.add_time|date:'d/m/Y h:i:s'}}</span>
+                 
+        </div>
+      </div>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteanswerModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete "{{answer}}"?</p>
+        <form method="POST" action="{% url 'main:delete_answer' answer.id %}" class="mt-3 mb-3">
+          {% csrf_token %}
+         <a class="btn btn-secondary" href="{% url 'main:single_question_page' question.id %}">Cancel</a>
+         <input class="btn btn-danger" value="Delete" type="submit" name="Confirm">
+       </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit answer modal -->
+
+<div class="modal fade" id="EditAnswerModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Answer</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{% url 'main:update_answer' answer.id %}" class="mt-3 mb-3">
+          {% csrf_token %}
+          {{answerForm.answer}}
+        <a class="btn btn-secondary" href="{% url 'main:single_question_page' question.id %}">Cancel</a>
+        <input class="btn btn-primary" value="Save Changes" type="submit" name="Confirm">
+      </form>
+      
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    </div>
+</div>
+<hr/>
+{% endfor %}
+
+
+    </div>
+        
+
+
+    </div>
+</div>
+
+
+
+{% endblock %}

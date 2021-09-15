@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load user_tags %}
 {% load humanize %}
 {% block title %}OHC | {{question.title}}{% endblock %}
 {% block content %}
@@ -15,8 +16,12 @@
 
 			<form method="POST" action="{% url 'main:delete_answer' answer.id %}">
 				 {% csrf_token %}
+				 {% if request.user|has_group:"moderators" or request.user|has_group:"admins" %}
 
+				<a class="btn btn-warning" href="{% url 'accounts:single_question_page' answer.question.id %}">Cancel</a>
+				{% else %}
 				<a class="btn btn-warning" href="{% url 'main:single_question_page' answer.question.id %}">Cancel</a>
+				{% endif %}
 				<input class="btn btn-danger" type="submit" value="Delete" name="Confirm">
 			</form>
 		</div>

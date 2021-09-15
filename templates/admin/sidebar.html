@@ -6,7 +6,7 @@
         <div class="list-group list-group-flush my-3">
             
             <a href="{% url 'accounts:admin_dashboard' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Overview</a>
-            {% if request.user|has_group:"moderators" %}
+            {% if request.user|has_group:"admins" %}
             <a href="{% url 'accounts:users' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Users</a>
             <a href="{% url 'accounts:groups' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Groups</a>
             {% endif %}

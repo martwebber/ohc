@@ -8,6 +8,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib import messages
 from .forms import CreateUserForm, UserEditForm, UserProfileForm, UserLoginForm, UserForm, ProfileForm, UserGroupForm
+from main.forms import AnswerForm
 from .token import account_activation_token
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -22,7 +23,7 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from datetime import timedelta
 from django.utils.timezone import now
-
+from django.shortcuts import get_object_or_404
 
 
 
@@ -352,3 +353,35 @@ def topic(request,pk):
         'is_following': is_following,
     }
     return render(request,'admin/topic.html',context)
+
+
+# def deleteTopic(request, pk):
+#     topic = Topic.objects.get(id=pk)
+#     if request.method == 'POST':
+#         topic.delete()
+#         return redirect('accounts:topics')
+#     context = {'topic':topic}
+#     return render(request, 'admin/delete-topic.html', context)
+
+
+# Single question
+def single_question_page(request, id):
+    post = get_object_or_404(Question, id=id)
+    fav = bool
+    if post.favourites.filter(id=request.user.id).exists():
+        fav = True
+    question = Question.objects.get(pk=id)
+    tags = question.tags.split(',')
+    answers = Answer.objects.filter(question=question)
+    answerform = AnswerForm
+    
+    if request.method == 'POST':
+        answerContent = AnswerForm(request.POST)
+        if answerContent.is_valid():
+            answer = answerContent.save(commit=False)
+            answer.question = question
+            answer.user = request.user
+            answer.save()
+            messages.success(request, 'Your answer has been submitted.')
+    context = {'question': question, 'tags': tags, 'answers': answers, 'answerForm': answerform, 'fav':fav}
+    return render(request, 'admin/single-question-page.html', context)

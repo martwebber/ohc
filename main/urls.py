@@ -18,15 +18,12 @@ urlpatterns = [
     path('question/<int:id>', views.single_question_page, name='single_question_page'),
     path('update-question/<int:id>', views.updateQuestion, name="update_question"),
     path('delete-question/<int:pk>', views.deleteQuestion, name="delete_question"),
-   # path('like/', views.like, name='like'),
     path('fav/<int:id>', views.favourite_add, name='favourite_add'),
     path('profile/favourites/', views.favourite_list, name='favourite_list'),
-
     path('delete-answer/<int:pk>', views.deleteAnswer, name="delete_answer"),
     path('update-answer/<int:pk>', views.updateAnswer, name="update_answer"),
     path('topic/<int:pk>',views.topic,name='topic'),
 
- #   path('question/<int:id>',views.save_answer,name='save_answer'),
    # Tag Page
     path('tag/<str:tag>',views.tag,name='tag'),
     # Tags Page
@@ -44,7 +41,6 @@ urlpatterns = [
     path('topics/',views.topics,name='topics'),
 
     path('add-topic/', views.add_topic, name='add_topic'),
-    path('delete-topic/<int:pk>', views.deleteTopic, name='delete_topic'),
 
     
 

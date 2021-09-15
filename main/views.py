@@ -340,10 +340,3 @@ def add_topic(request):
     return render(request, 'topics.html', context)
 
 
-def deleteTopic(request, pk):
-    topic = Topic.objects.get(id=pk)
-    if request.method == 'POST':
-        topic.delete()
-        return redirect('main:topics')
-    context = {'topic':topic}
-    return render(request, 'single-question.html', context)

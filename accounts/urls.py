@@ -47,6 +47,9 @@ urlpatterns = [
 
     path('admin-dashboard/topics/',views.topics,name='topics'),
     path('admin-dashboard/topic/<int:pk>',views.topic,name='topic'),
+    # path('admin-dashboard/topic/delete-topic/<int:pk>', views.deleteTopic, name='delete_topic'),
+    path('admin-dashboard/question/<int:id>', views.single_question_page, name='single_question_page'),
+
 
 
 

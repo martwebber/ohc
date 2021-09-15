@@ -25,7 +25,7 @@
                     <td scope="col"><a href="">{{answer.question.title}}</a></td>
                     <td scope="col">{{answer.user.username}} </td>
                     <td scope="col">{{answer.add_time}}</td>
-                    <td scope="col"><a class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteUserModal">Delete</a></td>
+                    <td scope="col"><a class="btn btn-sm btn-danger" href="{% url 'main:delete_answer' answer.id %}">Delete</a></td>
                 </tr>
 
                 {% endfor %}

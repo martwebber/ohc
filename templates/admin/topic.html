@@ -6,9 +6,14 @@
         <div class="row d-flex justify-content-center">
             <div class="card mt-1 col">
                 <div class="row">
-              <h2 class="my-4 col-md-10">{{topic.topic}}</h2>
+              <h2 class="my-4 col-md-8">{{topic.topic}}</h2>
               
-              <h5 class="col-md-2 my-4 ">{{number_of_followers}} {% if number_of_followers == 1 %} Follower {%else%} Followers {%endif%}</h5>
+              <h6 class="col-md-2 my-4 ">{{number_of_followers}} {% if number_of_followers == 1 %} Follower {%else%} Followers {%endif%}</h6>
+              <p class="col-md-2">
+                <!-- <a class=" my-4 btn btn-primary btn-sm ">Edit</a>
+                <a href="{% url 'accounts:delete_topic' topic.id %}" class=" my-4 btn btn-danger btn-sm">Delete</a>   -->
+              </p>
+             
             </div>
 <hr>                                    
 {% if quests %}
