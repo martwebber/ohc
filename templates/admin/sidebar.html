@@ -6,10 +6,10 @@
         <div class="list-group list-group-flush my-3">
             
             <a href="{% url 'accounts:admin_dashboard' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Overview</a>
-            {% if request.user|has_group:"admins" %}
+           {% comment %} {% if request.user|has_group:"admins" %}
             <a href="{% url 'accounts:users' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Users</a>
             <a href="{% url 'accounts:groups' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Groups</a>
-            {% endif %}
+            {% endif %} {% endcomment %}
             <a href="{% url 'accounts:questions' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Questions</a>
             <a href="{% url 'accounts:answers' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Answers</a>
             <a href="{% url 'accounts:topics' %}" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">Topics</a>

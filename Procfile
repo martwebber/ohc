@@ -1,1 +1,1 @@
-gunicorn ohc.wsgi
+gunicorn ohc.wsgi --log-file -

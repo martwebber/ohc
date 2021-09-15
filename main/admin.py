@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Question, Answer, Topic
-# from accounts.models import CustomUser
+from .models import Question, Answer, Topic, CustomUser
+# from accounts.models import 
+from django.contrib.auth.models import User
 
 
 class QuestionAdmin(admin.ModelAdmin):
@@ -10,8 +11,12 @@ class QuestionAdmin(admin.ModelAdmin):
 
 admin.site.register(Question, QuestionAdmin)
 
+class AnswerAdmin(admin.ModelAdmin):
+    list_display = ('answer', 'user')
+    search_fields = ('answer', )
 
-admin.site.register(Answer)
+
+admin.site.register(Answer, AnswerAdmin)
 
 
 

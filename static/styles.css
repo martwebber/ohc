@@ -85,3 +85,8 @@
       margin-left: -15rem;
     }
   }
+
+  .float-right {
+    float: right!important;
+    display: none !important;
+}
